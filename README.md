@@ -4,12 +4,10 @@ A small web app that converts your HEX code to the closest color in the Tailwind
 Built with Astro and React.
 
 [Site](https://hextotailwind.com) is ranked 2nd on Google search results and 1st on Bing.
-View the site traffic analytics [here](https://um.app.taralys.com/share/9lrPut4XEF1miVx3/hextotailwind.com).
 
 ## Requirements
 
 - Node v20
-- [Umami](https://umami.is/) for analytics
 - [Web3Forms](https://web3forms.com/) for feedback form submissions
 - hextotailwind.com domain
 

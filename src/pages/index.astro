@@ -40,18 +40,6 @@ const image = "/meta.webp";
     <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={new URL(image, Astro.url)} />
-
-    <!-- Analytics -->
-    {
-      import.meta.env.PROD && (
-        <script
-          is:inline
-          defer
-          src={import.meta.env.PUBLIC_ANALYTICS_URL}
-          data-website-id={import.meta.env.PUBLIC_ANALYTICS_WEBSITE_ID}
-        />
-      )
-    }
   </head>
   <body class="bg-neutral-100">
     <main class="mx-auto max-w-prose p-3 mt-3 md:mt-10">
