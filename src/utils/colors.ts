@@ -261,9 +261,33 @@ const getContrastReport = (hex: string) => {
 
   return {
     black,
-    recommendedText: white >= black ? "white" : "black",
     white,
   };
+};
+
+const getRecommendedTextColors = (
+  backgroundHex: string,
+  entries: TailwindColorEntry[],
+) => {
+  const solidHex = `#${backgroundHex}`;
+
+  return [...entries]
+    .map((entry) => {
+      const contrast = wcagContrast(solidHex, `#${entry.hex}`);
+
+      return {
+        aaa: contrast >= AAA_CONTRAST,
+        aa: contrast >= AA_CONTRAST,
+        contrast,
+        hex: entry.hex,
+        tailwind: entry.name,
+      };
+    })
+    .filter((entry) => entry.aa)
+    .sort((a, b) => {
+      if (b.contrast !== a.contrast) return b.contrast - a.contrast;
+      return a.tailwind.localeCompare(b.tailwind);
+    });
 };
 
 const getDarkModeComplement = (
@@ -336,6 +360,10 @@ export const closestTailwindToColor = (
 
   const familyScale = families.get(closestTailwind.family) ?? [closestTailwind];
   const contrast = getContrastReport(closestTailwind.hex);
+  const recommendedTextColors = getRecommendedTextColors(
+    closestTailwind.hex,
+    entries,
+  );
   const darkModeComplement = getDarkModeComplement(
     closestTailwind,
     familyScale,
@@ -360,7 +388,8 @@ export const closestTailwindToColor = (
       black: contrast.black,
       blackAA: contrast.black >= AA_CONTRAST,
       blackAAA: contrast.black >= AAA_CONTRAST,
-      recommendedText: contrast.recommendedText,
+      recommendedText: recommendedTextColors[0]?.tailwind,
+      recommendedTextColors,
       white: contrast.white,
       whiteAA: contrast.white >= AA_CONTRAST,
       whiteAAA: contrast.white >= AAA_CONTRAST,

@@ -22,7 +22,7 @@ type HistoryItem = {
   version: TailwindVersion;
 };
 
-const HexToTailwind = ({ url }: { url: string }) => {
+const ColorToTailwind = ({ url }: { url: string }) => {
   const [colorInput, setColorInput] = useState("3e3e66");
   const [version, setVersion] = useState<TailwindVersion>("v4");
   const [history, setHistory] = useState<HistoryItem[]>([]);
@@ -240,8 +240,8 @@ const HexToTailwind = ({ url }: { url: string }) => {
                   value={closestTailwind.diff > 1 ? "Yes" : "No"}
                 />
                 <StatBadge
-                  label="Recommended Text"
-                  value={closestTailwind.contrast.recommendedText}
+                  label="Best Text"
+                  value={closestTailwind.contrast.recommendedText ?? "None"}
                 />
               </div>
             ) : null}
@@ -386,6 +386,44 @@ const HexToTailwind = ({ url }: { url: string }) => {
                     aaa={closestTailwind.contrast.blackAAA}
                     previewColor={`#${closestTailwind.hex}`}
                   />
+                </div>
+                <div className="mt-5">
+                  <div className="mb-3 flex items-center justify-between gap-3">
+                    <p className="text-xs font-bold tracking-[0.24em] text-slate-400 uppercase">
+                      Tailwind Text Suggestions
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      AA or better on this background
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {closestTailwind.contrast.recommendedTextColors
+                      .slice(0, 12)
+                      .map((textColor) => (
+                        <Copy
+                          key={textColor.tailwind}
+                          onClick={createCopyToClipboardFunction(
+                            `text-${textColor.tailwind}`,
+                          )}
+                        >
+                          <span className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-950">
+                            <span
+                              className="block h-6 w-6 rounded-full border border-white/70 shadow-sm"
+                              style={{ backgroundColor: `#${textColor.hex}` }}
+                            />
+                            <span className="min-w-0">
+                              <span className="block truncate font-mono text-xs font-bold text-slate-800 dark:text-slate-100">
+                                {textColor.tailwind}
+                              </span>
+                              <span className="block text-[11px] text-slate-500 dark:text-slate-400">
+                                {textColor.aaa ? "AAA" : "AA"} ·{" "}
+                                {textColor.contrast.toFixed(2)}:1
+                              </span>
+                            </span>
+                          </span>
+                        </Copy>
+                      ))}
+                  </div>
                 </div>
               </Panel>
 
@@ -757,4 +795,4 @@ const checkerboardStyle: CSSProperties = {
   backgroundSize: "20px 20px",
 };
 
-export default HexToTailwind;
+export default ColorToTailwind;

@@ -1,6 +1,6 @@
 ---
 import "../styles/global.css";
-import HexToTailwind from "../components/HexToTailwind";
+import ColorToTailwind from "../components/ColorToTailwind";
 import FeedbackForm from "../components/FeedbackForm";
 import Link from "../components/Link.astro";
 import HexCodeInUrlNotifier from "../components/HexInUrlNotifier";
@@ -91,7 +91,7 @@ const image = "/meta.webp";
           </Link>.
         </p>
       </section>
-      <HexToTailwind client:load url={canonicalURL.toString()} />
+      <ColorToTailwind client:load url={canonicalURL.toString()} />
       <HexCodeInUrlNotifier client:only="react" />
       <div class="grid grid-cols-1 gap-8 mt-12 md:grid-cols-2">
         <section
@@ -124,8 +124,9 @@ const image = "/meta.webp";
             <p>
               We'll instantly calculate the closest Tailwind CSS match using the <span
                 class="font-medium text-slate-700 dark:text-slate-300"
-                >Delta E algorithm</span
               >
+                Delta E algorithm
+              </span>
               , which measures the mathematical difference between colors exactly
               as the human eye perceives them.
             </p>
@@ -135,9 +136,111 @@ const image = "/meta.webp";
               difference between your color and the Tailwind color is actually
               visible (<span
                 class="font-medium text-slate-700 dark:text-slate-300"
-                >Delta E > 1</span
-              >).
+              >
+                Delta E > 1
+              </span>).
             </p>
+            <div class="pt-2">
+              <h3
+                class="mb-4 text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100"
+              >
+                What you get back
+              </h3>
+              <div class="grid gap-3 sm:grid-cols-3">
+                <div
+                  class="rounded-2xl border border-indigo-100 bg-indigo-50/80 p-4 dark:border-indigo-900/40 dark:bg-indigo-950/30"
+                >
+                  <p
+                    class="text-xs font-bold tracking-[0.24em] uppercase text-indigo-500 dark:text-indigo-300"
+                  >
+                    Match
+                  </p>
+                  <p
+                    class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400"
+                  >
+                    The closest Tailwind token, quick-copy utility variants, and
+                    an arbitrary-value fallback when the palette match is not
+                    close enough.
+                  </p>
+                </div>
+                <div
+                  class="rounded-2xl border border-cyan-100 bg-cyan-50/80 p-4 dark:border-cyan-900/40 dark:bg-cyan-950/30"
+                >
+                  <p
+                    class="text-xs font-bold tracking-[0.24em] uppercase text-cyan-600 dark:text-cyan-300"
+                  >
+                    Analysis
+                  </p>
+                  <p
+                    class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400"
+                  >
+                    Delta E visibility, nearest 3 matches, full shade-family
+                    preview, and dark-mode pair suggestions for the selected
+                    color family.
+                  </p>
+                </div>
+                <div
+                  class="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-4 dark:border-emerald-900/40 dark:bg-emerald-950/30"
+                >
+                  <p
+                    class="text-xs font-bold tracking-[0.24em] uppercase text-emerald-600 dark:text-emerald-300"
+                  >
+                    Accessibility
+                  </p>
+                  <p
+                    class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400"
+                  >
+                    WCAG contrast scores against white and black text plus AA
+                    and AAA pass-fail indicators so you can evaluate readability
+                    immediately.
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div class="pt-2">
+              <h3
+                class="mb-4 text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100"
+              >
+                Best results workflow
+              </h3>
+              <ol class="space-y-3">
+                <li class="flex gap-3">
+                  <span
+                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                  >
+                    1
+                  </span>
+                  <p class="text-slate-600 dark:text-slate-400">
+                    Paste the real source color first, not the color you think
+                    is closest. This keeps the Delta E comparison honest.
+                  </p>
+                </li>
+                <li class="flex gap-3">
+                  <span
+                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                  >
+                    2
+                  </span>
+                  <p class="text-slate-600 dark:text-slate-400">
+                    Check the shade family and nearest 3 matches before copying.
+                    The mathematically closest result is not always the best fit
+                    for your UI context.
+                  </p>
+                </li>
+                <li class="flex gap-3">
+                  <span
+                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                  >
+                    3
+                  </span>
+                  <p class="text-slate-600 dark:text-slate-400">
+                    If the arbitrary value suggestion appears, use it
+                    deliberately. That usually means the built-in palette is too
+                    far away from the original brand color.
+                  </p>
+                </li>
+              </ol>
+            </div>
           </div>
         </section>
         <section
@@ -200,16 +303,16 @@ const image = "/meta.webp";
                 <li>
                   <strong class="text-slate-800 dark:text-slate-200">
                     Accessibility Checks:
-                  </strong> Instantly see the matched color's contrast ratio
-                  against white and black text, with WCAG AA/AAA pass or fail
-                  badges so UI decisions are safer.
+                  </strong> Instantly see the matched color's contrast ratio against
+                  white and black text, with WCAG AA/AAA pass or fail badges so UI
+                  decisions are safer.
                 </li>
                 <li>
                   <strong class="text-slate-800 dark:text-slate-200">
                     Shade Family + Top 3 Matches:
-                  </strong> Instead of only showing one answer, this version
-                  previews the entire matched scale and the three nearest
-                  Tailwind candidates so you can compare real alternatives.
+                  </strong> Instead of only showing one answer, this version previews
+                  the entire matched scale and the three nearest Tailwind candidates
+                  so you can compare real alternatives.
                 </li>
                 <li>
                   <strong class="text-slate-800 dark:text-slate-200">
@@ -226,28 +329,28 @@ const image = "/meta.webp";
                     class="bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
                   >
                     border-
-                  </code> classes, arbitrary value fallback suggestions for poor
-                  matches, and dark mode complements for faster implementation.
+                  </code> classes, arbitrary value fallback suggestions for poor matches,
+                  and dark mode complements for faster implementation.
                 </li>
                 <li>
                   <strong class="text-slate-800 dark:text-slate-200">
                     Built-In Color Converter:
-                  </strong> The tool also breaks your input into HEX, RGB, HSL,
-                  and OKLCH formats, which makes it useful even when you are not
-                  copying the Tailwind match directly.
+                  </strong> The tool also breaks your input into HEX, RGB, HSL, and
+                  OKLCH formats, which makes it useful even when you are not copying
+                  the Tailwind match directly.
                 </li>
                 <li>
                   <strong class="text-slate-800 dark:text-slate-200">
                     Search History:
-                  </strong> Recently viewed colors are saved locally so you can
-                  jump back to a previous comparison without retyping values.
+                  </strong> Recently viewed colors are saved locally so you can jump
+                  back to a previous comparison without retyping values.
                 </li>
                 <li>
                   <strong class="text-slate-800 dark:text-slate-200">
                     Premium UI:
                   </strong> A redesigned, responsive glassmorphism aesthetic with
-                  split-view comparison, history controls, and richer analysis
-                  panels than the original utility.
+                  split-view comparison, history controls, and richer analysis panels
+                  than the original utility.
                 </li>
               </ul>
               <p class="pt-2">
@@ -314,10 +417,7 @@ const image = "/meta.webp";
     >
       <p>Copyright Tuxedo Software {new Date().getFullYear()}</p>
     </footer>
-    <script
-      is:inline
-      src="https://web3forms.com/client/script.js"
-      async
-      defer></script>
+    <script is:inline src="https://web3forms.com/client/script.js" async defer
+    ></script>
   </body>
 </html>

@@ -99,6 +99,11 @@ test("returns family scale, dark mode complement, and contrast metadata", () => 
   });
   expect(result.contrast.blackAA).toBe(true);
   expect(result.contrast.whiteAA).toBe(false);
+  expect(result.contrast.recommendedTextColors.length).toBeGreaterThan(0);
+  expect(result.contrast.recommendedTextColors[0]?.tailwind).toBe("black");
+  expect(result.contrast.recommendedTextColors.every((entry) => entry.aa)).toBe(
+    true,
+  );
 });
 
 test("returns normalized format breakdown for the input color", () => {
