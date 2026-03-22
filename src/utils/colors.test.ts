@@ -15,6 +15,7 @@ test.each([
   expect(hexToRgb(input)).toStrictEqual(expected);
 });
 
+// ── v4 palette tests (default) ──────────────────────────────────────────
 test.each([
   ["000000", { tailwind: "black", hex: "000000", truncatedDiff: 0 }],
   ["ffffff", { tailwind: "white", hex: "ffffff", truncatedDiff: 0 }],
@@ -23,11 +24,65 @@ test.each([
   ["9101ec", { tailwind: "purple-600", hex: "9810fa", truncatedDiff: 2 }],
   ["123c2d", { tailwind: "emerald-950", hex: "002c22", truncatedDiff: 5 }],
   ["rgb(0, 0, 0)", { tailwind: "black", hex: "000000", truncatedDiff: 0 }],
-  ["hsl(0, 0%, 100%)", { tailwind: "white", hex: "ffffff", truncatedDiff: 0 }],
-])("closestTailwindToColor(%s) -> %j", (input, expected) => {
-  const closestTailwind = closestTailwindToColor(input);
+  [
+    "hsl(0, 0%, 100%)",
+    { tailwind: "white", hex: "ffffff", truncatedDiff: 0 },
+  ],
+])("closestTailwindToColor(%s, v4) -> %j", (input, expected) => {
+  const closestTailwind = closestTailwindToColor(input, "v4");
 
   expect(closestTailwind.tailwind).toBe(expected.tailwind);
   expect(closestTailwind.hex).toBe(expected.hex);
   expect(Math.trunc(closestTailwind.diff)).toBe(expected.truncatedDiff);
+});
+
+// ── v3 palette tests ────────────────────────────────────────────────────
+test.each([
+  ["000000", { tailwind: "black", hex: "000000", truncatedDiff: 0 }],
+  ["3b82f6", { tailwind: "blue-500", hex: "3b82f6", truncatedDiff: 0 }],
+])("closestTailwindToColor(%s, v3) -> %j", (input, expected) => {
+  const closestTailwind = closestTailwindToColor(input, "v3");
+
+  expect(closestTailwind.tailwind).toBe(expected.tailwind);
+  expect(closestTailwind.hex).toBe(expected.hex);
+  expect(Math.trunc(closestTailwind.diff)).toBe(expected.truncatedDiff);
+});
+
+// ── v1 palette tests ────────────────────────────────────────────────────
+test.each([
+  ["000000", { tailwind: "black", hex: "000000", truncatedDiff: 0 }],
+  ["4299e1", { tailwind: "blue-500", hex: "4299e1", truncatedDiff: 0 }],
+])("closestTailwindToColor(%s, v1) -> %j", (input, expected) => {
+  const closestTailwind = closestTailwindToColor(input, "v1");
+
+  expect(closestTailwind.tailwind).toBe(expected.tailwind);
+  expect(closestTailwind.hex).toBe(expected.hex);
+  expect(Math.trunc(closestTailwind.diff)).toBe(expected.truncatedDiff);
+});
+
+// ── Alpha / opacity support ─────────────────────────────────────────────
+test.each([
+  [
+    "rgba(59, 130, 246, 0.4)",
+    { tailwindIncludes: "/40", hasAlpha: true, alpha: 0.4 },
+  ],
+  ["#3b82f666", { tailwindIncludes: "/40", hasAlpha: true, alpha: 0.4 }],
+  [
+    "hsla(217, 91%, 60%, 0.5)",
+    { tailwindIncludes: "/50", hasAlpha: true, alpha: 0.5 },
+  ],
+  [
+    "#3b82f6",
+    { tailwindIncludes: undefined, hasAlpha: false, alpha: undefined },
+  ],
+])("alpha support: closestTailwindToColor(%s) -> %j", (input, expected) => {
+  const result = closestTailwindToColor(input as string, "v3");
+
+  if (expected.hasAlpha) {
+    expect(result.tailwind).toContain(expected.tailwindIncludes);
+    expect(result.alpha).toBeCloseTo(expected.alpha!, 2);
+  } else {
+    expect(result.tailwind).not.toContain("/");
+    expect(result.alpha).toBeUndefined();
+  }
 });

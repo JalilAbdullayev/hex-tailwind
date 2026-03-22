@@ -1,14 +1,20 @@
 import colors from "tailwindcss/colors";
 import { closest, diff, rgb_to_lab } from "color-diff";
-import { formatHex } from "culori";
+import { formatHex, parse } from "culori";
+import {
+  tailwindV1,
+  tailwindV2,
+  tailwindV3,
+  type TailwindPalette,
+} from "./tailwind-palettes";
 
-type DefaultColors = typeof colors;
+export type TailwindVersion = "v1" | "v2" | "v3" | "v4";
+
 type Rgb = { R: number; G: number; B: number };
 type RgbMap = Map<Rgb, string>;
 
 export const hexToRgb: (hex: string) => Rgb = (hex) => {
   // https://github.com/sindresorhus/hex-rgb/blob/main/index.js
-
   const number = Number.parseInt(hex, 16);
   const red = number >> 16;
   const green = (number >> 8) & 255;
@@ -17,7 +23,29 @@ export const hexToRgb: (hex: string) => Rgb = (hex) => {
   return { R: red, G: green, B: blue };
 };
 
-const rgbToTailwindMap: (colors: DefaultColors) => RgbMap = (colors) => {
+// ── Build an RGB→TailwindName map from a palette ────────────────────────
+const buildMapFromPalette = (palette: TailwindPalette): RgbMap => {
+  const out = new Map<Rgb, string>();
+
+  for (const [name, value] of Object.entries(palette)) {
+    if (typeof value === "string") {
+      // e.g. black: "#000000", white: "#ffffff"
+      const hex = formatHex(value)?.slice(1);
+      if (hex) out.set(hexToRgb(hex), name);
+    } else {
+      for (const [shade, colorValue] of Object.entries(value)) {
+        const hex = formatHex(colorValue)?.slice(1);
+        if (hex) out.set(hexToRgb(hex), `${name}-${shade}`);
+      }
+    }
+  }
+
+  return out;
+};
+
+// ── Build map from the live v4 import (oklch values) ────────────────────
+const buildMapFromV4 = (): RgbMap => {
+  type DefaultColors = typeof colors;
   let importedColors = JSON.parse(JSON.stringify(colors));
 
   delete importedColors.inherit;
@@ -77,9 +105,34 @@ const rgbToTailwindMap: (colors: DefaultColors) => RgbMap = (colors) => {
   return out;
 };
 
-const RgbToTailwindMap = rgbToTailwindMap(colors);
-const TailwindRgbColors = [...RgbToTailwindMap.keys()];
+// ── Cached maps per version ─────────────────────────────────────────────
+const mapCache = new Map<TailwindVersion, { map: RgbMap; keys: Rgb[] }>();
 
+const getVersionData = (version: TailwindVersion) => {
+  if (mapCache.has(version)) return mapCache.get(version)!;
+
+  let map: RgbMap;
+  switch (version) {
+    case "v1":
+      map = buildMapFromPalette(tailwindV1);
+      break;
+    case "v2":
+      map = buildMapFromPalette(tailwindV2);
+      break;
+    case "v3":
+      map = buildMapFromPalette(tailwindV3);
+      break;
+    case "v4":
+      map = buildMapFromV4();
+      break;
+  }
+
+  const data = { map, keys: [...map.keys()] };
+  mapCache.set(version, data);
+  return data;
+};
+
+// ── Helpers ─────────────────────────────────────────────────────────────
 const componentToHex = (c: number) => {
   var hex = c.toString(16);
   return hex.length == 1 ? "0" + hex : hex;
@@ -88,14 +141,28 @@ const componentToHex = (c: number) => {
 const rgbToHex = (rgb: Rgb) =>
   componentToHex(rgb.R) + componentToHex(rgb.G) + componentToHex(rgb.B);
 
-export const closestTailwindToColor = (colorInput: string) => {
+// ── Main function ───────────────────────────────────────────────────────
+export const closestTailwindToColor = (
+  colorInput: string,
+  version: TailwindVersion = "v4",
+) => {
   const hex = formatHex(colorInput);
   if (!hex) {
     throw Error("invalid color");
   }
 
+  // Extract alpha from the parsed color
+  const parsed = parse(colorInput);
+  const alpha =
+    parsed && parsed.alpha !== undefined && parsed.alpha < 1
+      ? parsed.alpha
+      : undefined;
+
   const normalizedHex = hex.slice(1); // remove '#'
   const gotRgb = hexToRgb(normalizedHex);
+
+  const { map: RgbToTailwindMap, keys: TailwindRgbColors } =
+    getVersionData(version);
 
   const closestTailwindRgb: Rgb = closest(gotRgb, TailwindRgbColors);
   const closestTailwindDiff: number = diff(
@@ -110,10 +177,19 @@ export const closestTailwindToColor = (colorInput: string) => {
     throw Error("couldn't find closest tailwind");
   }
 
+  // Append opacity suffix if alpha is present (e.g. blue-500/40)
+  const opacityPercent =
+    alpha !== undefined ? Math.round(alpha * 100) : undefined;
+  const tailwindClass =
+    opacityPercent !== undefined
+      ? `${closestTailwind}/${opacityPercent}`
+      : closestTailwind;
+
   return {
-    tailwind: closestTailwind,
+    tailwind: tailwindClass,
     hex: closestTailwindHex,
     diff: closestTailwindDiff,
+    alpha,
   };
 };
 

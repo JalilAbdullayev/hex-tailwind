@@ -11,20 +11,19 @@ Built with Astro and React.
 ## Notes
 
 The [colors.ts](./src/utils/colors.ts) file holds the Color to Tailwind algorithm. See
-the [How does it work?](https://colortotailwind.netlify.app/) section for what the algorithm does.
+the [How it works?](https://colortotailwind.netlify.app/) section for what the algorithm does.
 
 The project uses Nano Stores to [share state](https://docs.astro.build/en/recipes/sharing-state-islands/)
 between React components. With this, the site can pass URL path attributes to the components without
 wrapping it entirely in React.
 
-## TODO
+## Features
 
-- add more content on the h1 / open-graph titles for better SEO
-- Google shows the content instead of metadata; add `data-nosnippet` attribute for
-  dynamic section to avoid it being shown in preview
-- support older Tailwind versions
-- support 4-character (or other format) HEX codes
-- add contrast between background and the 2 rendered colors
+- **Multi-format input:** HEX (3, 4, 6, 8-character), RGB, RGBA, HSL, HSLA, and named CSS colors
+- **Alpha / Opacity:** Colors with alpha (e.g. `rgba(59, 130, 246, 0.4)`, `#3B82F666`) output Tailwind classes with opacity (e.g. `blue-500/40`)
+- **Tailwind v1–v4 palettes:** Toggle between Tailwind versions with a single click
+- **SEO optimized:** Descriptive meta tags; `data-nosnippet` on dynamic content
+- **Contrast-aware preview:** Checkerboard pattern behind color swatches for visibility
 
 ## Commands
 

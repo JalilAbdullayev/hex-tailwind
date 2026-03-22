@@ -5,9 +5,11 @@ import FeedbackForm from "../components/FeedbackForm";
 import Link from "../components/Link.astro";
 import HexCodeInUrlNotifier from "../components/HexInUrlNotifier";
 
-const title = "Color to Tailwind";
+const title =
+  "Color to Tailwind — Convert HEX, RGB, HSL to Tailwind CSS Colors";
+const ogTitle = "Color to Tailwind";
 const description =
-  "Find the closest Tailwind color for a given color. A simple online web app that is completely free.";
+  "Find the closest Tailwind CSS color for any HEX, RGB, or HSL value. A free online converter with support for Tailwind v1–v4 palettes.";
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const image = "/meta.webp";
 ---
@@ -30,7 +32,7 @@ const image = "/meta.webp";
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={ogTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:site_name" content="Color to Tailwind" />
     <meta property="og:image" content={new URL(image, Astro.url)} />
@@ -38,7 +40,7 @@ const image = "/meta.webp";
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={Astro.url} />
-    <meta property="twitter:title" content={title} />
+    <meta property="twitter:title" content={ogTitle} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={new URL(image, Astro.url)} />
   </head>
@@ -129,16 +131,37 @@ const image = "/meta.webp";
               <p>This fork has been supercharged for the modern web:</p>
               <ul class="pl-5 space-y-2 list-disc">
                 <li>
-                  <strong class="text-slate-800">Extended Color Support:</strong> Supports
-                  RGB, HSL, and named colors in addition to standard HEX codes.
+                  <strong class="text-slate-800">
+                    Extended Color Support:
+                  </strong> Supports HEX (3, 4, 6, 8-character), RGB, RGBA, HSL, HSLA,
+                  and named CSS colors.
                 </li>
                 <li>
-                  <strong class="text-slate-800">Tailwind v4 Ready:</strong> Fully
-                  updated to support the latest V4 color palettes and syntax.
+                  <strong class="text-slate-800">Alpha / Opacity:</strong> Colors
+                  with alpha (e.g. <code
+                    class="bg-slate-100 text-indigo-600 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
+                  >
+                    rgba(59, 130, 246, 0.4)
+                  </code> or <code
+                    class="bg-slate-100 text-indigo-600 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
+                  >
+                    #3B82F666
+                  </code>) output Tailwind classes with opacity like <code
+                    class="bg-slate-100 text-indigo-600 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
+                  >
+                    blue-500/40
+                  </code>.
                 </li>
                 <li>
-                  <strong class="text-slate-800">Premium UI:</strong> A redesigned,
-                  responsive glassmorphism aesthetic with split-view comparison.
+                  <strong class="text-slate-800">
+                    Tailwind v1–v4 Palettes:
+                  </strong> Toggle between all four major Tailwind CSS versions with
+                  a single click.
+                </li>
+                <li>
+                  <strong class="text-slate-800"> Premium UI: </strong> A redesigned,
+                  responsive glassmorphism aesthetic with split-view comparison and
+                  contrast-aware color preview.
                 </li>
               </ul>
               <p class="pt-2">
@@ -156,7 +179,6 @@ const image = "/meta.webp";
                   </span>
                 </Link>. Completely open source!
               </p>
-
               <div class="flex flex-wrap gap-3 pt-4">
                 <Link url="https://github.com/JalilAbdullayev/hex-tailwind/">
                   <span
@@ -177,7 +199,6 @@ const image = "/meta.webp";
           </div>
         </section>
       </div>
-
       <section
         class="relative p-8 mt-12 mb-8 overflow-hidden border bg-indigo-50/70 border-indigo-100/50 shadow-input rounded-3xl md:p-12"
       >

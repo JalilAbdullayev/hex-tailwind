@@ -1,13 +1,19 @@
 import { useEffect, useState, type ChangeEvent } from "react";
-import { closestTailwindToColor } from "../utils/colors";
+import {
+  closestTailwindToColor,
+  type TailwindVersion,
+} from "../utils/colors";
 import Copy from "./Copy";
 import ClipboardIcon from "./ClipboardIcon";
 import { useStore } from "@nanostores/react";
 import { hexCodeInUrlStore } from "../hexCodeInUrlStore";
 import { formatHex } from "culori";
 
+const VERSIONS: TailwindVersion[] = ["v1", "v2", "v3", "v4"];
+
 const HexToTailwind = ({ url }: { url: string }) => {
   const [colorInput, setColorInput] = useState("3e3e66");
+  const [version, setVersion] = useState<TailwindVersion>("v4");
 
   const $hexCodeInUrlStore = useStore(hexCodeInUrlStore);
 
@@ -19,7 +25,7 @@ const HexToTailwind = ({ url }: { url: string }) => {
   }, [$hexCodeInUrlStore]);
 
   const closestTailwind = isValidColor(colorInput)
-    ? closestTailwindToColor(colorInput)
+    ? closestTailwindToColor(colorInput, version)
     : undefined;
 
   const handleColorInputChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -49,8 +55,26 @@ const HexToTailwind = ({ url }: { url: string }) => {
 
   const urlToCopy = `${url}?hex=${encodeURIComponent(colorInput)}`;
 
+  // Compute alpha-aware background colors for the preview swatches
+  const inputHex = formatHex(colorInput);
+  const inputAlpha = closestTailwind?.alpha;
+  const inputBgColor = inputHex
+    ? inputAlpha !== undefined
+      ? hexToRgba(inputHex, inputAlpha)
+      : inputHex
+    : "transparent";
+
+  const matchBgColor = closestTailwind
+    ? inputAlpha !== undefined
+      ? hexToRgba("#" + closestTailwind.hex, inputAlpha)
+      : "#" + closestTailwind.hex
+    : "transparent";
+
   return (
-    <section className="group relative mb-4 w-full overflow-hidden rounded-4xl border border-indigo-50 bg-white p-6 shadow-xl shadow-indigo-100/50 transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-100/60 md:p-12">
+    <section
+      data-nosnippet
+      className="group relative mb-4 w-full overflow-hidden rounded-4xl border border-indigo-50 bg-white p-6 shadow-xl shadow-indigo-100/50 transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-100/60 md:p-12"
+    >
       <div className="pointer-events-none absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-indigo-50/80 opacity-70 blur-3xl transition-opacity group-hover:opacity-100"></div>
       <div className="pointer-events-none absolute bottom-0 left-0 -mb-20 -ml-20 h-64 w-64 rounded-full bg-purple-50/80 opacity-70 blur-3xl transition-opacity group-hover:opacity-100"></div>
       <div className="relative z-10 grid grid-cols-1 items-start gap-x-8 gap-y-8 md:grid-cols-2 lg:gap-x-16">
@@ -115,25 +139,36 @@ const HexToTailwind = ({ url }: { url: string }) => {
             )}
           </div>
         </div>
+        {/* Color comparison panel with checkerboard for contrast */}
         <div className="relative col-span-1 mt-2 mb-2 flex h-32 w-full overflow-hidden rounded-3xl border-2 border-slate-200/60 shadow-inner md:col-span-2 md:h-40">
           <div className="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-100 bg-white/90 px-3 py-1 text-xs font-bold tracking-widest text-slate-400 uppercase shadow shadow-black/5 backdrop-blur">
             VS
           </div>
-          <div
-            className="h-full w-1/2 transition-colors duration-300"
-            style={{ backgroundColor: formatHex(colorInput) || "transparent" }}
-          ></div>
-          <div
-            className="h-full w-1/2 transition-colors duration-300"
-            style={{
-              backgroundColor: closestTailwind
-                ? "#" + closestTailwind.hex
-                : "transparent",
-            }}
-          ></div>
+          {/* Left swatch: input color */}
+          <div className="relative h-full w-1/2">
+            <div
+              className="absolute inset-0"
+              style={{ ...checkerboardStyle }}
+            ></div>
+            <div
+              className="absolute inset-0 border-r border-slate-200/40 transition-colors duration-300"
+              style={{ backgroundColor: inputBgColor }}
+            ></div>
+          </div>
+          {/* Right swatch: tailwind match */}
+          <div className="relative h-full w-1/2">
+            <div
+              className="absolute inset-0"
+              style={{ ...checkerboardStyle }}
+            ></div>
+            <div
+              className="absolute inset-0 transition-colors duration-300"
+              style={{ backgroundColor: matchBgColor }}
+            ></div>
+          </div>
         </div>
         <div className="col-span-1 mt-2 flex flex-col items-start justify-between gap-5 rounded-2xl border border-slate-100 bg-slate-50/80 p-6 sm:flex-row sm:items-center md:col-span-2">
-          <div className="flex items-center gap-3 text-base md:text-lg">
+          <div className="flex flex-wrap items-center gap-3 text-base md:text-lg">
             <span className="font-medium text-slate-500">
               Difference visible?
             </span>{" "}
@@ -144,6 +179,27 @@ const HexToTailwind = ({ url }: { url: string }) => {
             ) : (
               <span className="text-slate-400">...</span>
             )}
+            {/* Tailwind version selector */}
+            <div className="flex items-center gap-2 ml-auto">
+              <span className="text-sm font-medium text-slate-400">
+                Tailwind:
+              </span>
+              <div className="inline-flex overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+                {VERSIONS.map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => setVersion(v)}
+                    className={`px-3 py-1.5 text-sm font-semibold transition-all ${
+                      version === v
+                        ? "bg-indigo-600 text-white shadow-sm"
+                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                    }`}
+                  >
+                    {v.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
           <div className="relative flex cursor-pointer items-center gap-2 rounded-xl border border-indigo-50 bg-white px-5 py-3 text-sm font-medium tracking-wide text-indigo-600 shadow-sm transition-all hover:-translate-y-0.5 hover:text-indigo-800 hover:shadow active:translate-y-0">
             <Copy onClick={createCopyToClipboardFunction(urlToCopy)}>
@@ -164,5 +220,25 @@ const isValidColor = (input: string) => formatHex(input) !== undefined;
 const ColorDifferenceResult = (diff: number) => (
   <span className="font-bold">{diff > 1 ? "Yes" : "No"}</span>
 );
+
+/** Convert a hex color + alpha (0-1) to an rgba() string */
+const hexToRgba = (hex: string, alpha: number): string => {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+};
+
+/** CSS checkerboard pattern for showing transparency */
+const checkerboardStyle: React.CSSProperties = {
+  backgroundImage: `
+    linear-gradient(45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(-45deg, #e2e8f0 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #e2e8f0 75%),
+    linear-gradient(-45deg, transparent 75%, #e2e8f0 75%)
+  `,
+  backgroundSize: "20px 20px",
+  backgroundPosition: "0 0, 0 10px, 10px -10px, -10px 0px",
+};
 
 export default HexToTailwind;
