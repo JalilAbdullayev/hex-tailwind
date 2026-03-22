@@ -12,7 +12,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const image = "/meta.webp";
 ---
 
-<html lang="en">
+<html lang="en" class="scroll-smooth">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/png" href="/favicon.png" />
@@ -42,99 +42,158 @@ const image = "/meta.webp";
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={new URL(image, Astro.url)} />
   </head>
-  <body class="bg-neutral-100">
-    <main class="p-3 mx-auto mt-3 max-w-prose md:mt-10">
-      <section class="mb-8">
-        <h1 class="mb-3 text-4xl font-bold">HEX to Tailwind</h1>
-        <p class="text-xl md:text-2xl">
-          Convert your HEX code to the closest color in the
-          <Link url="https://tailwindcss.com/docs/customizing-colors"
-            >Tailwind color palette</Link
-          >.
+  <body
+    class="min-h-screen overflow-x-hidden font-sans antialiased bg-linear-to-br from-indigo-50 via-white to-purple-50 text-slate-900 selection:bg-indigo-100 selection:text-indigo-900"
+  >
+    <main class="container p-4 mt-8 mb-24 space-y-8 md:mt-16 md:space-y-12">
+      <section class="mb-4 text-center md:mb-12">
+        <h1
+          class="mb-5 text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-purple-600 sm:text-6xl md:text-7xl drop-shadow-sm"
+        >
+          HEX to Tailwind
+        </h1>
+        <p class="mx-auto text-lg leading-relaxed md:text-xl text-slate-600">
+          Convert your HEX code to the closest color in the{" "}
+          <Link url="https://tailwindcss.com/docs/colors">
+            <span
+              class="font-semibold text-indigo-500 underline transition-colors hover:text-indigo-600 decoration-indigo-200 underline-offset-4"
+            >
+              Tailwind color palette
+            </span>
+          </Link>.
         </p>
       </section>
       <HexToTailwind client:load url={canonicalURL.toString()} />
       <HexCodeInUrlNotifier client:only="react" />
-      <section class="mt-8 mb-8">
-        <h2 class="mb-3 text-2xl font-bold">How does it work?</h2>
-        <div class="space-y-3">
-          <p>
-            Type (or copy/paste) the HEX code in the input box on the left hand
-            side. The code can be with or without the hashtag.
-          </p>
-          <p>
-            The website will then generate the closest Tailwind color on the
-            right hand side, together with the corresponding HEX code. We use
-            the Delta E algorithm, which is the official way to measure the
-            difference between two colors.
-          </p>
-          <p>
-            You can quickly copy either of the two generated color codes by
-            clicking or tapping on the clipboard icon, or by pressing the Space
-            or Enter keys when focused on the icon. And you can compare the two
-            colors visually.
-          </p>
-          <p>
-            We also highlight whether the difference between the HEX code input
-            and the generated Tailwind color is visible to the human eye. We do
-            this by checking whether the Delta E score is higher than 1, which
-            is the official way to establish this fact.
-          </p>
+      <div class="grid grid-cols-1 gap-8 mt-12 md:grid-cols-2">
+        <section
+          class="p-8 transition-shadow duration-300 border border-white shadow-xl bg-white/80 backdrop-blur-xl shadow-indigo-100/40 rounded-3xl md:p-10 hover:shadow-2xl"
+        >
+          <h2 class="mb-5 text-2xl font-bold tracking-tight text-slate-800">
+            How it works
+          </h2>
+          <div class="space-y-4 leading-relaxed text-slate-600">
+            <p>
+              Type (or paste) your HEX code in the input box. The hashtag is
+              optional, so <code
+                class="bg-slate-100 text-indigo-600 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
+              >
+                #3B82F6
+              </code> or <code
+                class="bg-slate-100 text-indigo-600 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
+              >
+                3B82F6
+              </code> work perfectly.
+            </p>
+            <p>
+              We'll instantly calculate the closest Tailwind CSS match using the <span
+                class="font-medium text-slate-700">Delta E algorithm</span
+              >
+              , which measures the mathematical difference between colors exactly
+              as the human eye perceives them.
+            </p>
+            <p>
+              Copy the original HEX, the matched HEX, or the Tailwind class name
+              with a single click. We also let you know if the difference
+              between your color and the Tailwind color is actually visible (<span
+                class="font-medium text-slate-700">Delta E > 1</span
+              >).
+            </p>
+          </div>
+        </section>
+        <section
+          class="flex flex-col justify-between p-8 transition-shadow duration-300 border border-white shadow-xl bg-white/80 backdrop-blur-xl shadow-indigo-100/40 rounded-3xl md:p-10 hover:shadow-2xl"
+        >
+          <div>
+            <h2 class="mb-5 text-2xl font-bold tracking-tight text-slate-800">
+              About the project
+            </h2>
+            <div class="space-y-4 leading-relaxed text-slate-600">
+              <p>
+                <Link url="https://hextotailwind.com/"> Originally </Link> created
+                by
+                <Link url="https://github.com/mihailthebuilder/hex-tailwind">
+                  Mihail
+                </Link>, a software engineer who wanted an easier way to match
+                existing brand colors to Tailwind CSS palettes without manually
+                eyeballing them.
+              </p>
+              <h3 class="mt-4 text-xl font-bold tracking-tight text-slate-800">
+                Why use this version?
+              </h3>
+              <p>This fork has been supercharged for the modern web:</p>
+              <ul class="pl-5 space-y-2 list-disc">
+                <li>
+                  <strong class="text-slate-800">Tailwind v4 Ready:</strong> Fully
+                  updated to support the latest V4 color palettes and syntax.
+                </li>
+                <li>
+                  <strong class="text-slate-800">Premium UI:</strong> A redesigned,
+                  responsive glassmorphism aesthetic with split-view comparison.
+                </li>
+              </ul>
+              <p class="pt-2">
+                Powered by <Link url="https://astro.build/">
+                  <span
+                    class="font-semibold text-indigo-500 hover:text-indigo-600 hover:underline"
+                  >
+                    Astro
+                  </span>
+                </Link> and <Link url="https://react.dev/">
+                  <span
+                    class="font-semibold text-indigo-500 hover:text-indigo-600 hover:underline"
+                  >
+                    React
+                  </span>
+                </Link>. Completely open source!
+              </p>
+
+              <div class="flex flex-wrap gap-3 pt-4">
+                <Link url="https://github.com/JalilAbdullayev/hex-tailwind/">
+                  <span
+                    class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-md hover:bg-indigo-700 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all"
+                  >
+                    View this fork
+                  </span>
+                </Link>
+                <Link url="https://github.com/mihailthebuilder/hex-tailwind">
+                  <span
+                    class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-md hover:bg-slate-800 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-slate-900 transition-all"
+                  >
+                    Original Repo
+                  </span>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <section
+        class="relative p-8 mt-12 mb-8 overflow-hidden border bg-indigo-50/70 border-indigo-100/50 shadow-input rounded-3xl md:p-12"
+      >
+        <div
+          class="absolute top-0 right-0 w-64 h-64 -mt-20 -mr-20 rounded-full pointer-events-none bg-purple-100/50 blur-3xl"
+        >
         </div>
-      </section>
-      <section class="mb-8">
-        <h2 class="mb-3 text-2xl font-bold">About</h2>
-        <div class="space-y-3">
-          <p>
-            Hi there! My name is Mihail and I'm a software engineer based in
-            London, UK. I was initially sceptical of Tailwind, but I decided to
-            give it a go last year and never looked back.
+        <div class="relative z-10 mx-auto text-center">
+          <h2 class="mb-3 text-3xl font-bold tracking-tight text-slate-800">
+            Questions or feedback?
+          </h2>
+          <p class="mb-8 text-lg text-slate-600">
+            Have an idea on how to make this tool better? Let us know below.
           </p>
-          <p>
-            I often check out other websites for design inspiration, especially
-            around colour themes. But not everyone uses Tailwind; in those
-            instances, I have to figure out a way to fetch it from the HEX code
-            found in the CSS. Hence why I decided to build this website :)
-          </p>
-          <p>
-            I'm using the <Link url="https://astro.build/">Astro</Link> and <Link
-              url="https://react.dev/">React</Link
-            > frameworks for the website, and it's hosted on <Link
-              url="https://pages.cloudflare.com/">Cloudflare Pages</Link
-            > for free (woohoo!).
-          </p>
-          <p></p>
-        </div>
-      </section>
-      <section class="mb-8">
-        <h2 class="mb-3 text-2xl font-bold">Open source</h2>
-        <div class="space-y-3">
-          <p>
-            I've open-sourced the website! You can find the code on <Link
-              url="https://github.com/mihailthebuilder/hex-tailwind/"
-              >GitHub</Link
-            >.
-          </p>
-        </div>
-      </section>
-      <section>
-        <h2 class="mb-3 text-2xl font-bold">Contact me</h2>
-        <div>
-          <p class="mb-3">
-            Have questions/feedback? Send a message using the form below;
-            include your email if you'd like me to get back to you.
-          </p>
-          <FeedbackForm client:load />
-          <p class="mt-3">
-            You can also reach out to me directly <Link
-              url="https://linkedin.com/in/mihailmarian">on LinkedIn</Link
-            >.
-          </p>
+          <div
+            class="p-6 text-left transition-shadow border border-white shadow-sm bg-white/70 backdrop-blur-md md:p-8 rounded-2xl hover:shadow-md"
+          >
+            <FeedbackForm client:load />
+          </div>
         </div>
       </section>
     </main>
-    <footer class="my-5 text-center">
-      Copyright Tuxedo Software {new Date().getFullYear()}
+    <footer class="py-12 text-sm font-medium text-center text-slate-500">
+      <p>Copyright Tuxedo Software {new Date().getFullYear()}</p>
     </footer>
+    <script src="https://web3forms.com/client/script.js" async defer></script>
   </body>
 </html>

@@ -6,4 +6,6 @@ interface Props {
 const { url } = Astro.props;
 ---
 
-<a href={url} class="underline" target="_blank"><slot /></a>
+<a href={url} class="underline" target="_blank">
+  <slot />
+</a>

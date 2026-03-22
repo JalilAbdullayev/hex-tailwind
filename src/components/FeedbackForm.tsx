@@ -1,6 +1,9 @@
-import { useState, type SubmitEvent } from "react";
+import axios from "axios";
+import { useState, type ChangeEvent, type SubmitEvent } from "react";
 
 const FeedbackForm = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [feedback, setFeedback] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -11,17 +14,17 @@ const FeedbackForm = () => {
     setIsLoading(true);
 
     const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
     formData.append("feedback", feedback);
     formData.append("access_key", import.meta.env.PUBLIC_FORM_ACCESS_KEY);
 
-    fetch("https://api.web3forms.com/submit", {
-      method: "POST",
-      body: formData,
-    })
-      .then((response) => {
-        if (response.status != 200) {
+    axios
+      .post("https://api.web3forms.com/submit", formData)
+      .then(({ status, statusText }) => {
+        if (status != 200) {
           throw Error(
-            `Expected response status 200, got ${response.status}: ${response.statusText}`,
+            `Expected response status 200, got ${status}: ${statusText}`,
           );
         }
       })
@@ -40,33 +43,61 @@ const FeedbackForm = () => {
     <form className="space-y-5" onSubmit={handleSubmit}>
       {error && (
         <p className="font-semibold text-red-700">
-          Something went wrong, error message {error.message}. Please reach out
+          Something went wrong, error message: {error.message}. Please reach out
           to me{" "}
-          <a className="underline" href="https://linkedin.com/in/mihailmarian">
+          <a
+            className="underline"
+            href="https://linkedin.com/in/jalil-abdullayev/"
+            target="_blank"
+          >
             on LinkedIn
           </a>{" "}
           instead.
         </p>
       )}
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <input
+          type="text"
+          className="block w-full rounded-2xl border border-slate-200 bg-white/60 px-5 py-3.5 text-slate-800 placeholder-slate-400 shadow-sm transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/20 focus:outline-none"
+          value={name}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            setName(event.target.value)
+          }
+          placeholder="Your Name"
+          required
+        />
+        <input
+          type="email"
+          className="block w-full rounded-2xl border border-slate-200 bg-white/60 px-5 py-3.5 text-slate-800 placeholder-slate-400 shadow-sm transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/20 focus:outline-none"
+          value={email}
+          onChange={(event: ChangeEvent<HTMLInputElement>) =>
+            setEmail(event.target.value)
+          }
+          placeholder="Your E-mail"
+          required
+        />
+      </div>
       <textarea
-        rows={3}
-        className="block w-full rounded border border-black p-2 focus:ring-cyan-800"
+        rows={4}
+        className="block w-full rounded-2xl border border-slate-200 bg-white/60 px-5 py-4 text-slate-800 placeholder-slate-400 shadow-sm transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/20 focus:outline-none"
         value={feedback}
-        onChange={(event) => {
-          setFeedback(event.target.value);
-        }}
-        placeholder="Feed me feedback..."
+        onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
+          setFeedback(event.target.value)
+        }
+        placeholder="How can we improve HEX to Tailwind?"
         required
       ></textarea>
       <button
         type="submit"
         className={
-          (isLoading ? "bg-gray-600" : "bg-blue-800 hover:bg-blue-950") +
-          ` w-full rounded px-10 py-2 font-semibold text-white md:w-40`
+          (isLoading
+            ? "cursor-not-allowed bg-slate-400"
+            : "bg-indigo-600 hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-lg active:translate-y-0") +
+          ` w-full rounded-xl px-10 py-3.5 font-semibold text-white shadow-md transition-all md:w-auto`
         }
         disabled={isLoading}
       >
-        {isLoading ? "..." : "Submit"}
+        {isLoading ? "Submitting..." : "Submit Feedback"}
       </button>
     </form>
   );
