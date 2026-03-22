@@ -199,9 +199,55 @@ const image = "/meta.webp";
                 </li>
                 <li>
                   <strong class="text-slate-800 dark:text-slate-200">
+                    Accessibility Checks:
+                  </strong> Instantly see the matched color's contrast ratio
+                  against white and black text, with WCAG AA/AAA pass or fail
+                  badges so UI decisions are safer.
+                </li>
+                <li>
+                  <strong class="text-slate-800 dark:text-slate-200">
+                    Shade Family + Top 3 Matches:
+                  </strong> Instead of only showing one answer, this version
+                  previews the entire matched scale and the three nearest
+                  Tailwind candidates so you can compare real alternatives.
+                </li>
+                <li>
+                  <strong class="text-slate-800 dark:text-slate-200">
+                    Smarter Developer Output:
+                  </strong> Quick-copy <code
+                    class="bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
+                  >
+                    bg-
+                  </code>, <code
+                    class="bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
+                  >
+                    text-
+                  </code>, and <code
+                    class="bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
+                  >
+                    border-
+                  </code> classes, arbitrary value fallback suggestions for poor
+                  matches, and dark mode complements for faster implementation.
+                </li>
+                <li>
+                  <strong class="text-slate-800 dark:text-slate-200">
+                    Built-In Color Converter:
+                  </strong> The tool also breaks your input into HEX, RGB, HSL,
+                  and OKLCH formats, which makes it useful even when you are not
+                  copying the Tailwind match directly.
+                </li>
+                <li>
+                  <strong class="text-slate-800 dark:text-slate-200">
+                    Search History:
+                  </strong> Recently viewed colors are saved locally so you can
+                  jump back to a previous comparison without retyping values.
+                </li>
+                <li>
+                  <strong class="text-slate-800 dark:text-slate-200">
                     Premium UI:
                   </strong> A redesigned, responsive glassmorphism aesthetic with
-                  split-view comparison and contrast-aware color preview.
+                  split-view comparison, history controls, and richer analysis
+                  panels than the original utility.
                 </li>
               </ul>
               <p class="pt-2">
@@ -268,6 +314,10 @@ const image = "/meta.webp";
     >
       <p>Copyright Tuxedo Software {new Date().getFullYear()}</p>
     </footer>
-    <script src="https://web3forms.com/client/script.js" async defer></script>
+    <script
+      is:inline
+      src="https://web3forms.com/client/script.js"
+      async
+      defer></script>
   </body>
 </html>

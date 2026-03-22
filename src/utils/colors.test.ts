@@ -24,16 +24,14 @@ test.each([
   ["9101ec", { tailwind: "purple-600", hex: "9810fa", truncatedDiff: 2 }],
   ["123c2d", { tailwind: "emerald-950", hex: "002c22", truncatedDiff: 5 }],
   ["rgb(0, 0, 0)", { tailwind: "black", hex: "000000", truncatedDiff: 0 }],
-  [
-    "hsl(0, 0%, 100%)",
-    { tailwind: "white", hex: "ffffff", truncatedDiff: 0 },
-  ],
+  ["hsl(0, 0%, 100%)", { tailwind: "white", hex: "ffffff", truncatedDiff: 0 }],
 ])("closestTailwindToColor(%s, v4) -> %j", (input, expected) => {
   const closestTailwind = closestTailwindToColor(input, "v4");
 
   expect(closestTailwind.tailwind).toBe(expected.tailwind);
   expect(closestTailwind.hex).toBe(expected.hex);
   expect(Math.trunc(closestTailwind.diff)).toBe(expected.truncatedDiff);
+  expect(closestTailwind.topMatches).toHaveLength(3);
 });
 
 // ── v3 palette tests ────────────────────────────────────────────────────
@@ -46,6 +44,7 @@ test.each([
   expect(closestTailwind.tailwind).toBe(expected.tailwind);
   expect(closestTailwind.hex).toBe(expected.hex);
   expect(Math.trunc(closestTailwind.diff)).toBe(expected.truncatedDiff);
+  expect(closestTailwind.variants.background).toBe(`bg-${expected.tailwind}`);
 });
 
 // ── v1 palette tests ────────────────────────────────────────────────────
@@ -85,4 +84,38 @@ test.each([
     expect(result.tailwind).not.toContain("/");
     expect(result.alpha).toBeUndefined();
   }
+});
+
+test("returns family scale, dark mode complement, and contrast metadata", () => {
+  const result = closestTailwindToColor("#e2e8f0", "v3");
+
+  expect(result.tailwind).toBe("slate-200");
+  expect(result.family).toBe("slate");
+  expect(result.familyScale[0]?.tailwind).toBe("slate-50");
+  expect(result.familyScale.at(-1)?.tailwind).toBe("slate-950");
+  expect(result.darkModeComplement).toStrictEqual({
+    hex: "1e293b",
+    tailwind: "slate-800",
+  });
+  expect(result.contrast.blackAA).toBe(true);
+  expect(result.contrast.whiteAA).toBe(false);
+});
+
+test("returns normalized format breakdown for the input color", () => {
+  const result = closestTailwindToColor("rgb(59, 130, 246)", "v3");
+
+  expect(result.input.hex).toBe("#3B82F6");
+  expect(result.input.rgb).toBe("rgb(59, 130, 246)");
+  expect(result.input.hsl).toContain("hsl(");
+  expect(result.input.oklch).toContain("oklch(");
+});
+
+test("suggests an arbitrary value when the match is too far off", () => {
+  const result = closestTailwindToColor("#123c2d", "v4");
+
+  expect(result.arbitrarySuggestion).toStrictEqual({
+    className: "bg-[#123c2d]",
+    hex: "#123c2d",
+    threshold: 4,
+  });
 });

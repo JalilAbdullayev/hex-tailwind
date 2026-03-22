@@ -1,6 +1,6 @@
 import colors from "tailwindcss/colors";
 import { closest, diff, rgb_to_lab } from "color-diff";
-import { formatHex, parse } from "culori";
+import { converter, formatHex, formatHex8, parse, wcagContrast } from "culori";
 import {
   tailwindV1,
   tailwindV2,
@@ -11,7 +11,32 @@ import {
 export type TailwindVersion = "v1" | "v2" | "v3" | "v4";
 
 type Rgb = { R: number; G: number; B: number };
-type RgbMap = Map<Rgb, string>;
+type Shade = string | null;
+
+type TailwindColorEntry = {
+  family: string;
+  hex: string;
+  name: string;
+  rgb: Rgb;
+  shade: Shade;
+};
+
+type RgbMap = Map<Rgb, TailwindColorEntry>;
+
+type VersionData = {
+  entries: TailwindColorEntry[];
+  families: Map<string, TailwindColorEntry[]>;
+  keys: Rgb[];
+  map: RgbMap;
+};
+
+const rgbConverter = converter("rgb");
+const hslConverter = converter("hsl");
+const oklchConverter = converter("oklch");
+
+const AA_CONTRAST = 4.5;
+const AAA_CONTRAST = 7;
+const ARBITRARY_FALLBACK_THRESHOLD = 4;
 
 export const hexToRgb: (hex: string) => Rgb = (hex) => {
   // https://github.com/sindresorhus/hex-rgb/blob/main/index.js
@@ -23,19 +48,37 @@ export const hexToRgb: (hex: string) => Rgb = (hex) => {
   return { R: red, G: green, B: blue };
 };
 
+const createEntry = (
+  family: string,
+  shade: Shade,
+  value: string,
+): TailwindColorEntry | undefined => {
+  const hex = formatHex(value)?.slice(1);
+  if (!hex) return undefined;
+
+  return {
+    family,
+    hex,
+    name: shade ? `${family}-${shade}` : family,
+    rgb: hexToRgb(hex),
+    shade,
+  };
+};
+
 // ── Build an RGB→TailwindName map from a palette ────────────────────────
-const buildMapFromPalette = (palette: TailwindPalette): RgbMap => {
-  const out = new Map<Rgb, string>();
+const buildMapFromPalette = (
+  palette: TailwindPalette,
+): TailwindColorEntry[] => {
+  const out: TailwindColorEntry[] = [];
 
   for (const [name, value] of Object.entries(palette)) {
     if (typeof value === "string") {
-      // e.g. black: "#000000", white: "#ffffff"
-      const hex = formatHex(value)?.slice(1);
-      if (hex) out.set(hexToRgb(hex), name);
+      const entry = createEntry(name, null, value);
+      if (entry) out.push(entry);
     } else {
       for (const [shade, colorValue] of Object.entries(value)) {
-        const hex = formatHex(colorValue)?.slice(1);
-        if (hex) out.set(hexToRgb(hex), `${name}-${shade}`);
+        const entry = createEntry(name, shade, colorValue);
+        if (entry) out.push(entry);
       }
     }
   }
@@ -44,7 +87,7 @@ const buildMapFromPalette = (palette: TailwindPalette): RgbMap => {
 };
 
 // ── Build map from the live v4 import (oklch values) ────────────────────
-const buildMapFromV4 = (): RgbMap => {
+const buildMapFromV4 = (): TailwindColorEntry[] => {
   type DefaultColors = typeof colors;
   let importedColors = JSON.parse(JSON.stringify(colors));
 
@@ -57,12 +100,14 @@ const buildMapFromV4 = (): RgbMap => {
   delete importedColors.coolGray;
   delete importedColors.blueGray;
 
-  const out = new Map<Rgb, string>();
+  const out: TailwindColorEntry[] = [];
 
-  out.set(hexToRgb("000000"), "black");
+  const blackEntry = createEntry("black", null, "#000000");
+  if (blackEntry) out.push(blackEntry);
   delete importedColors.black;
 
-  out.set(hexToRgb("ffffff"), "white");
+  const whiteEntry = createEntry("white", null, "#ffffff");
+  if (whiteEntry) out.push(whiteEntry);
   delete importedColors.white;
 
   type TailwindColorsToMap = Omit<
@@ -87,18 +132,17 @@ const buildMapFromV4 = (): RgbMap => {
       | string;
 
     if (typeof tailwindShadesForGivenColor === "string") {
-      const hex = formatHex(tailwindShadesForGivenColor)?.slice(1);
-      if (hex) out.set(hexToRgb(hex), color);
+      const entry = createEntry(color, null, tailwindShadesForGivenColor);
+      if (entry) out.push(entry);
       return;
     }
 
     Object.keys(tailwindShadesForGivenColor).forEach((shade) => {
       const val = tailwindShadesForGivenColor[shade];
-      const hex =
-        typeof val === "string" ? formatHex(val)?.slice(1) : undefined;
-      if (hex) {
-        out.set(hexToRgb(hex), `${color}-${shade}`);
-      }
+      if (typeof val !== "string") return;
+
+      const entry = createEntry(color, shade, val);
+      if (entry) out.push(entry);
     });
   });
 
@@ -106,90 +150,245 @@ const buildMapFromV4 = (): RgbMap => {
 };
 
 // ── Cached maps per version ─────────────────────────────────────────────
-const mapCache = new Map<TailwindVersion, { map: RgbMap; keys: Rgb[] }>();
+const mapCache = new Map<TailwindVersion, VersionData>();
+
+const sortFamilyEntries = (entries: TailwindColorEntry[]) =>
+  [...entries].sort((a, b) => {
+    if (a.shade === null && b.shade === null) return 0;
+    if (a.shade === null) return -1;
+    if (b.shade === null) return 1;
+    return Number(a.shade) - Number(b.shade);
+  });
+
+const createVersionData = (entries: TailwindColorEntry[]): VersionData => {
+  const map = new Map<Rgb, TailwindColorEntry>();
+  const families = new Map<string, TailwindColorEntry[]>();
+
+  for (const entry of entries) {
+    map.set(entry.rgb, entry);
+
+    const familyEntries = families.get(entry.family) ?? [];
+    familyEntries.push(entry);
+    families.set(entry.family, familyEntries);
+  }
+
+  for (const [family, familyEntries] of families.entries()) {
+    families.set(family, sortFamilyEntries(familyEntries));
+  }
+
+  return {
+    entries,
+    families,
+    keys: entries.map((entry) => entry.rgb),
+    map,
+  };
+};
 
 const getVersionData = (version: TailwindVersion) => {
   if (mapCache.has(version)) return mapCache.get(version)!;
 
-  let map: RgbMap;
+  let entries: TailwindColorEntry[];
   switch (version) {
     case "v1":
-      map = buildMapFromPalette(tailwindV1);
+      entries = buildMapFromPalette(tailwindV1);
       break;
     case "v2":
-      map = buildMapFromPalette(tailwindV2);
+      entries = buildMapFromPalette(tailwindV2);
       break;
     case "v3":
-      map = buildMapFromPalette(tailwindV3);
+      entries = buildMapFromPalette(tailwindV3);
       break;
     case "v4":
-      map = buildMapFromV4();
+      entries = buildMapFromV4();
       break;
   }
 
-  const data = { map, keys: [...map.keys()] };
+  const data = createVersionData(entries);
   mapCache.set(version, data);
   return data;
 };
 
-// ── Helpers ─────────────────────────────────────────────────────────────
-const componentToHex = (c: number) => {
-  var hex = c.toString(16);
-  return hex.length == 1 ? "0" + hex : hex;
+const formatNumber = (value: number, digits = 3) =>
+  Number(value.toFixed(digits)).toString();
+
+const getInputFormats = (colorInput: string) => {
+  const parsed = parse(colorInput);
+  const hex = formatHex(colorInput);
+  const hex8 = formatHex8(colorInput);
+
+  if (!parsed || !hex || !hex8) {
+    throw Error("invalid color");
+  }
+
+  const rgb = rgbConverter(parsed);
+  const hsl = hslConverter(parsed);
+  const oklch = oklchConverter(parsed);
+
+  if (!rgb || !hsl || !oklch) {
+    throw Error("couldn't convert color");
+  }
+
+  return {
+    alpha:
+      parsed.alpha !== undefined && parsed.alpha < 1 ? parsed.alpha : undefined,
+    hex: hex.slice(1),
+    rgb: `rgb(${Math.round(rgb.r * 255)}, ${Math.round(rgb.g * 255)}, ${Math.round(
+      rgb.b * 255,
+    )}${parsed.alpha !== undefined && parsed.alpha < 1 ? ` / ${formatNumber(parsed.alpha, 2)}` : ""})`,
+    hsl: `hsl(${formatNumber(hsl.h ?? 0, 1)} ${formatNumber(hsl.s * 100, 1)}% ${formatNumber(hsl.l * 100, 1)}%${parsed.alpha !== undefined && parsed.alpha < 1 ? ` / ${formatNumber(parsed.alpha, 2)}` : ""})`,
+    oklch: `oklch(${formatNumber(oklch.l)} ${formatNumber(oklch.c)} ${formatNumber(
+      oklch.h ?? 0,
+      1,
+    )}${parsed.alpha !== undefined && parsed.alpha < 1 ? ` / ${formatNumber(parsed.alpha, 2)}` : ""})`,
+    arbitraryHex:
+      parsed.alpha !== undefined && parsed.alpha < 1
+        ? hex8.toLowerCase()
+        : hex.toLowerCase(),
+  };
 };
 
-const rgbToHex = (rgb: Rgb) =>
-  componentToHex(rgb.R) + componentToHex(rgb.G) + componentToHex(rgb.B);
+const withOpacitySuffix = (tailwind: string, alpha?: number) => {
+  if (alpha === undefined) return tailwind;
+
+  const opacityPercent = Math.round(alpha * 100);
+  return `${tailwind}/${opacityPercent}`;
+};
+
+const getContrastReport = (hex: string) => {
+  const solidHex = `#${hex}`;
+  const white = wcagContrast(solidHex, "#ffffff");
+  const black = wcagContrast(solidHex, "#000000");
+
+  return {
+    black,
+    recommendedText: white >= black ? "white" : "black",
+    white,
+  };
+};
+
+const getDarkModeComplement = (
+  entry: TailwindColorEntry,
+  familyScale: TailwindColorEntry[],
+) => {
+  if (entry.family === "white") {
+    return { hex: "000000", tailwind: "black" };
+  }
+
+  if (entry.family === "black") {
+    return { hex: "ffffff", tailwind: "white" };
+  }
+
+  if (familyScale.length <= 1) return undefined;
+
+  const currentIndex = familyScale.findIndex(
+    (familyEntry) => familyEntry.name === entry.name,
+  );
+
+  if (currentIndex === -1) return undefined;
+
+  const complement = familyScale[familyScale.length - 1 - currentIndex];
+  if (!complement) return undefined;
+
+  return {
+    hex: complement.hex,
+    tailwind: complement.name,
+  };
+};
+
+const createTopMatches = (
+  gotRgb: Rgb,
+  entries: TailwindColorEntry[],
+  alpha?: number,
+) =>
+  [...entries]
+    .map((entry) => ({
+      diff: diff(rgb_to_lab(gotRgb), rgb_to_lab(entry.rgb)),
+      hex: entry.hex,
+      tailwind: withOpacitySuffix(entry.name, alpha),
+    }))
+    .sort((a, b) => a.diff - b.diff)
+    .slice(0, 3);
 
 // ── Main function ───────────────────────────────────────────────────────
 export const closestTailwindToColor = (
   colorInput: string,
   version: TailwindVersion = "v4",
 ) => {
-  const hex = formatHex(colorInput);
-  if (!hex) {
-    throw Error("invalid color");
-  }
+  const inputFormats = getInputFormats(colorInput);
+  const gotRgb = hexToRgb(inputFormats.hex);
+  const {
+    entries,
+    families,
+    map: rgbToTailwindMap,
+    keys: tailwindRgbColors,
+  } = getVersionData(version);
 
-  // Extract alpha from the parsed color
-  const parsed = parse(colorInput);
-  const alpha =
-    parsed && parsed.alpha !== undefined && parsed.alpha < 1
-      ? parsed.alpha
-      : undefined;
-
-  const normalizedHex = hex.slice(1); // remove '#'
-  const gotRgb = hexToRgb(normalizedHex);
-
-  const { map: RgbToTailwindMap, keys: TailwindRgbColors } =
-    getVersionData(version);
-
-  const closestTailwindRgb: Rgb = closest(gotRgb, TailwindRgbColors);
+  const closestTailwindRgb: Rgb = closest(gotRgb, tailwindRgbColors);
   const closestTailwindDiff: number = diff(
     rgb_to_lab(gotRgb),
     rgb_to_lab(closestTailwindRgb),
   );
 
-  const closestTailwindHex = rgbToHex(closestTailwindRgb);
-
-  const closestTailwind = RgbToTailwindMap.get(closestTailwindRgb);
+  const closestTailwind = rgbToTailwindMap.get(closestTailwindRgb);
   if (closestTailwind === undefined) {
     throw Error("couldn't find closest tailwind");
   }
 
-  // Append opacity suffix if alpha is present (e.g. blue-500/40)
-  const opacityPercent =
-    alpha !== undefined ? Math.round(alpha * 100) : undefined;
-  const tailwindClass =
-    opacityPercent !== undefined
-      ? `${closestTailwind}/${opacityPercent}`
-      : closestTailwind;
+  const familyScale = families.get(closestTailwind.family) ?? [closestTailwind];
+  const contrast = getContrastReport(closestTailwind.hex);
+  const darkModeComplement = getDarkModeComplement(
+    closestTailwind,
+    familyScale,
+  );
+  const tailwindClass = withOpacitySuffix(
+    closestTailwind.name,
+    inputFormats.alpha,
+  );
+  const arbitrarySuggestion =
+    closestTailwindDiff >= ARBITRARY_FALLBACK_THRESHOLD
+      ? {
+          className: `bg-[${inputFormats.arbitraryHex}]`,
+          hex: inputFormats.arbitraryHex,
+          threshold: ARBITRARY_FALLBACK_THRESHOLD,
+        }
+      : undefined;
 
   return {
+    alpha: inputFormats.alpha,
+    arbitrarySuggestion,
+    contrast: {
+      black: contrast.black,
+      blackAA: contrast.black >= AA_CONTRAST,
+      blackAAA: contrast.black >= AAA_CONTRAST,
+      recommendedText: contrast.recommendedText,
+      white: contrast.white,
+      whiteAA: contrast.white >= AA_CONTRAST,
+      whiteAAA: contrast.white >= AAA_CONTRAST,
+    },
+    darkModeComplement,
     tailwind: tailwindClass,
-    hex: closestTailwindHex,
     diff: closestTailwindDiff,
-    alpha,
+    family: closestTailwind.family,
+    familyScale: familyScale.map((entry) => ({
+      hex: entry.hex,
+      isMatch: entry.name === closestTailwind.name,
+      tailwind: entry.name,
+    })),
+    hex: closestTailwind.hex,
+    input: {
+      hex: `#${inputFormats.hex.toUpperCase()}`,
+      hsl: inputFormats.hsl,
+      oklch: inputFormats.oklch,
+      rgb: inputFormats.rgb,
+    },
+    rawTailwind: closestTailwind.name,
+    shade: closestTailwind.shade,
+    topMatches: createTopMatches(gotRgb, entries, inputFormats.alpha),
+    variants: {
+      background: `bg-${tailwindClass}`,
+      border: `border-${tailwindClass}`,
+      text: `text-${tailwindClass}`,
+    },
   };
 };
 
