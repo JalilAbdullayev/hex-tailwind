@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type SubmitEvent } from "react";
 
 const FeedbackForm = () => {
   const [feedback, setFeedback] = useState("");
@@ -6,7 +6,7 @@ const FeedbackForm = () => {
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<Error>();
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = (event: SubmitEvent) => {
     event.preventDefault();
     setIsLoading(true);
 
@@ -21,7 +21,7 @@ const FeedbackForm = () => {
       .then((response) => {
         if (response.status != 200) {
           throw Error(
-            `Expected response status 200, got ${response.status}: ${response.statusText}`
+            `Expected response status 200, got ${response.status}: ${response.statusText}`,
           );
         }
       })
@@ -33,13 +33,13 @@ const FeedbackForm = () => {
   };
 
   if (submitted) {
-    return <p className="text-green-700 font-bold">Submitted!</p>;
+    return <p className="font-bold text-green-700">Submitted!</p>;
   }
 
   return (
     <form className="space-y-5" onSubmit={handleSubmit}>
       {error && (
-        <p className="text-red-700 font-semibold">
+        <p className="font-semibold text-red-700">
           Something went wrong, error message {error.message}. Please reach out
           to me{" "}
           <a className="underline" href="https://linkedin.com/in/mihailmarian">
@@ -50,7 +50,7 @@ const FeedbackForm = () => {
       )}
       <textarea
         rows={3}
-        className="border border-black block rounded focus:ring-cyan-800 p-2 w-full"
+        className="block w-full rounded border border-black p-2 focus:ring-cyan-800"
         value={feedback}
         onChange={(event) => {
           setFeedback(event.target.value);
@@ -62,7 +62,7 @@ const FeedbackForm = () => {
         type="submit"
         className={
           (isLoading ? "bg-gray-600" : "bg-blue-800 hover:bg-blue-950") +
-          ` text-white font-semibold py-2 px-10 rounded w-full md:w-40`
+          ` w-full rounded px-10 py-2 font-semibold text-white md:w-40`
         }
         disabled={isLoading}
       >

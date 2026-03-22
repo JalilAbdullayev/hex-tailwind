@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ChangeEvent } from "react";
 import { closestTailwindToHex } from "../utils/colors";
 import Copy from "./Copy";
 import ClipboardIcon from "./ClipboardIcon";
@@ -22,7 +22,7 @@ const HexToTailwind = ({ url }: { url: string }) => {
     ? closestTailwindToHex(hexInput)
     : undefined;
 
-  const handleHexInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleHexInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     let newInput = event.target.value.toLowerCase();
 
     if (newInput.length === 0) {
@@ -36,7 +36,7 @@ const HexToTailwind = ({ url }: { url: string }) => {
   };
 
   const createCopyToClipboardFunction = (
-    text: string
+    text: string,
   ): (() => Promise<void>) => {
     return async () => {
       try {
@@ -50,7 +50,7 @@ const HexToTailwind = ({ url }: { url: string }) => {
   const urlToCopy = `${url}?hex=${hexInput}`;
 
   return (
-    <section className="text-[1.25rem]">
+    <section className="text-xl">
       <div className="grid grid-cols-2 gap-y-2">
         <label className="font-bold" htmlFor="hexcode">
           Input HEX code:
@@ -60,20 +60,20 @@ const HexToTailwind = ({ url }: { url: string }) => {
         <input
           id="hexcode"
           type="text"
-          className="border border-black uppercase w-40 block rounded focus:ring-cyan-800 p-2"
+          className="block w-40 rounded border border-black p-2 uppercase focus:ring-cyan-800"
           value={`#${hexInput}`}
           onChange={handleHexInputChange}
         />
 
-        <div className="flex flex-col align-middle justify-center">
+        <div className="flex flex-col justify-center align-middle">
           <span>
             {closestTailwind ? (
               <>
-                <div className="flex mb-2">
+                <div className="mb-2 flex">
                   <div className="mr-1">{closestTailwind.tailwind}</div>
                   <Copy
                     onClick={createCopyToClipboardFunction(
-                      closestTailwind.tailwind
+                      closestTailwind.tailwind,
                     )}
                   >
                     <ClipboardIcon />
@@ -85,7 +85,7 @@ const HexToTailwind = ({ url }: { url: string }) => {
                   </div>
                   <Copy
                     onClick={createCopyToClipboardFunction(
-                      "#" + closestTailwind.hex.toUpperCase()
+                      "#" + closestTailwind.hex.toUpperCase(),
                     )}
                   >
                     <ClipboardIcon />
@@ -111,13 +111,13 @@ const HexToTailwind = ({ url }: { url: string }) => {
           }}
         ></div>
 
-        <div className="col-span-2 text-[1.15rem] md:text-[1.25rem]">
+        <div className="col-span-2 text-lg md:text-xl">
           Difference visible to the human eye?{" "}
           {closestTailwind
             ? ColorDifferenceResult(closestTailwind.diff)
             : "..."}
         </div>
-        <div className="col-span-2 text-[1.15rem] md:text-[1.25rem]">
+        <div className="col-span-2 text-lg md:text-xl">
           <Copy onClick={createCopyToClipboardFunction(urlToCopy)}>
             <span className="underline">Copy Link</span>
           </Copy>

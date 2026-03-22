@@ -1,4 +1,5 @@
 ---
+import "../styles/global.css";
 import HexToTailwind from "../components/HexToTailwind";
 import FeedbackForm from "../components/FeedbackForm";
 import Link from "../components/Link.astro";
@@ -42,10 +43,10 @@ const image = "/meta.webp";
     <meta property="twitter:image" content={new URL(image, Astro.url)} />
   </head>
   <body class="bg-neutral-100">
-    <main class="mx-auto max-w-prose p-3 mt-3 md:mt-10">
+    <main class="p-3 mx-auto mt-3 max-w-prose md:mt-10">
       <section class="mb-8">
-        <h1 class="text-4xl font-bold mb-3">HEX to Tailwind</h1>
-        <p class="text-[1.25rem] md:text-[1.5rem]">
+        <h1 class="mb-3 text-4xl font-bold">HEX to Tailwind</h1>
+        <p class="text-xl md:text-2xl">
           Convert your HEX code to the closest color in the
           <Link url="https://tailwindcss.com/docs/customizing-colors"
             >Tailwind color palette</Link
@@ -55,7 +56,7 @@ const image = "/meta.webp";
       <HexToTailwind client:load url={canonicalURL.toString()} />
       <HexCodeInUrlNotifier client:only="react" />
       <section class="mt-8 mb-8">
-        <h2 class="text-2xl font-bold mb-3">How does it work?</h2>
+        <h2 class="mb-3 text-2xl font-bold">How does it work?</h2>
         <div class="space-y-3">
           <p>
             Type (or copy/paste) the HEX code in the input box on the left hand
@@ -82,7 +83,7 @@ const image = "/meta.webp";
         </div>
       </section>
       <section class="mb-8">
-        <h2 class="text-2xl font-bold mb-3">About</h2>
+        <h2 class="mb-3 text-2xl font-bold">About</h2>
         <div class="space-y-3">
           <p>
             Hi there! My name is Mihail and I'm a software engineer based in
@@ -106,7 +107,7 @@ const image = "/meta.webp";
         </div>
       </section>
       <section class="mb-8">
-        <h2 class="text-2xl font-bold mb-3">Open source</h2>
+        <h2 class="mb-3 text-2xl font-bold">Open source</h2>
         <div class="space-y-3">
           <p>
             I've open-sourced the website! You can find the code on <Link
@@ -117,7 +118,7 @@ const image = "/meta.webp";
         </div>
       </section>
       <section>
-        <h2 class="text-2xl font-bold mb-3">Contact me</h2>
+        <h2 class="mb-3 text-2xl font-bold">Contact me</h2>
         <div>
           <p class="mb-3">
             Have questions/feedback? Send a message using the form below;

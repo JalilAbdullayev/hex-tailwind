@@ -13,7 +13,7 @@ const CopyIcon = ({
     setTimeout(() => {
       setNotifyCopied(false);
     }, 1000);
-    return <span className="text-green-600 font-semibold">Copied!</span>;
+    return <span className="font-semibold text-green-600">Copied!</span>;
   }
 
   const handleCopy = () => {

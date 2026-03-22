@@ -11,21 +11,27 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@astrojs/check": "^0.7.0",
-    "@astrojs/react": "^3.3.4",
-    "@astrojs/tailwind": "^5.1.0",
-    "@nanostores/react": "^0.7.2",
-    "@types/react": "^18.3.2",
-    "@types/react-dom": "^18.3.0",
-    "astro": "^4.8.7",
+    "@astrojs/check": "^0.9.8",
+    "@astrojs/react": "^5.0.1",
+    "@astrojs/tailwind": "^6.0.2",
+    "@nanostores/react": "^1.1.0",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "astro": "^6.0.8",
     "color-diff": "^1.4.0",
-    "nanostores": "^0.10.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "tailwindcss": "^3.4.3",
-    "typescript": "^5.4.5"
+    "culori": "^4.0.2",
+    "nanostores": "^1.2.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "tailwindcss": "^4.2.2",
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "vitest": "^1.6.0"
+    "@types/color-diff": "^1.2.5",
+    "@types/culori": "^4.0.1",
+    "prettier": "^3.8.1",
+    "prettier-plugin-tailwindcss": "^0.7.2",
+    "vitest": "^4.1.0"
   }
 }

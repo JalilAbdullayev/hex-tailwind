@@ -1,9 +1,8 @@
 import colors from "tailwindcss/colors";
-import type { DefaultColors } from "tailwindcss/types/generated/colors";
+import { closest, diff, rgb_to_lab } from "color-diff";
+import { formatHex } from "culori";
 
-// @ts-ignore
-import { closest, diff } from "color-diff";
-
+type DefaultColors = typeof colors;
 type Rgb = { R: number; G: number; B: number };
 type RgbMap = Map<Rgb, string>;
 
@@ -52,14 +51,26 @@ const rgbToTailwindMap: (colors: DefaultColors) => RgbMap = (colors) => {
     | "black"
   >;
 
-  const colorsToMap = importedColors as TailwindColorsToMap;
+  const colorsToMap: TailwindColorsToMap = importedColors;
 
   Object.keys(colorsToMap).forEach((color) => {
-    const tailwindShadesForGivenColor = colorsToMap[color as "stone"];
+    const tailwindShadesForGivenColor = colorsToMap[color as "stone"] as
+      | Record<string, string>
+      | string;
+
+    if (typeof tailwindShadesForGivenColor === "string") {
+      const hex = formatHex(tailwindShadesForGivenColor)?.slice(1);
+      if (hex) out.set(hexToRgb(hex), color);
+      return;
+    }
 
     Object.keys(tailwindShadesForGivenColor).forEach((shade) => {
-      const hex = tailwindShadesForGivenColor[shade as "50"].slice(1);
-      out.set(hexToRgb(hex), `${color}-${shade}`);
+      const val = tailwindShadesForGivenColor[shade];
+      const hex =
+        typeof val === "string" ? formatHex(val)?.slice(1) : undefined;
+      if (hex) {
+        out.set(hexToRgb(hex), `${color}-${shade}`);
+      }
     });
   });
 
@@ -67,24 +78,26 @@ const rgbToTailwindMap: (colors: DefaultColors) => RgbMap = (colors) => {
 };
 
 const RgbToTailwindMap = rgbToTailwindMap(colors);
+const TailwindRgbColors = [...RgbToTailwindMap.keys()];
 
-const TailwindRgbColors = Array.from(RgbToTailwindMap.keys());
-
-function componentToHex(c: number) {
+const componentToHex = (c: number) => {
   var hex = c.toString(16);
   return hex.length == 1 ? "0" + hex : hex;
-}
+};
 
-function rgbToHex(rgb: Rgb) {
-  return componentToHex(rgb.R) + componentToHex(rgb.G) + componentToHex(rgb.B);
-}
+const rgbToHex = (rgb: Rgb) =>
+  componentToHex(rgb.R) + componentToHex(rgb.G) + componentToHex(rgb.B);
 
 export const closestTailwindToHex = (hex: string) => {
   const normalizedHex = normalizeHex(hex);
   const gotRgb = hexToRgb(normalizedHex);
 
-  const closestTailwindRgb = closest(gotRgb, TailwindRgbColors) as Rgb;
-  const closestTailwindDiff = diff(gotRgb, closestTailwindRgb) as number;
+  const closestTailwindRgb: Rgb = closest(gotRgb, TailwindRgbColors);
+  const closestTailwindDiff: number = diff(
+    rgb_to_lab(gotRgb),
+    rgb_to_lab(closestTailwindRgb),
+  );
+
   const closestTailwindHex = rgbToHex(closestTailwindRgb);
 
   const closestTailwind = RgbToTailwindMap.get(closestTailwindRgb);
