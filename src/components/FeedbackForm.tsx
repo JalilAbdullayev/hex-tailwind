@@ -21,10 +21,10 @@ const FeedbackForm = () => {
 
     axios
       .post("https://api.web3forms.com/submit", formData)
-      .then(({ status, statusText }) => {
-        if (status != 200) {
+      .then((res) => {
+        if (res.status != 200) {
           throw Error(
-            `Expected response status 200, got ${status}: ${statusText}`,
+            `Expected response status 200, got ${res.status}: ${res.statusText}`,
           );
         }
       })
@@ -36,13 +36,15 @@ const FeedbackForm = () => {
   };
 
   if (submitted) {
-    return <p className="font-bold text-green-700">Submitted!</p>;
+    return (
+      <p className="font-bold text-green-700 dark:text-green-400">Submitted!</p>
+    );
   }
 
   return (
     <form className="space-y-5" onSubmit={handleSubmit}>
       {error && (
-        <p className="font-semibold text-red-700">
+        <p className="font-semibold text-red-700 dark:text-red-400">
           Something went wrong, error message: {error.message}. Please reach out
           to me{" "}
           <a
@@ -58,7 +60,7 @@ const FeedbackForm = () => {
       <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         <input
           type="text"
-          className="block w-full rounded-2xl border border-slate-200 bg-white/60 px-5 py-3.5 text-slate-800 placeholder-slate-400 shadow-sm transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/20 focus:outline-none"
+          className="block w-full rounded-2xl border border-slate-200 bg-white/60 px-5 py-3.5 text-slate-800 placeholder-slate-400 shadow-sm transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800/40 dark:text-slate-100 dark:placeholder-slate-500 dark:hover:bg-slate-800 dark:focus:border-indigo-500 dark:focus:bg-slate-800"
           value={name}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             setName(event.target.value)
@@ -68,7 +70,7 @@ const FeedbackForm = () => {
         />
         <input
           type="email"
-          className="block w-full rounded-2xl border border-slate-200 bg-white/60 px-5 py-3.5 text-slate-800 placeholder-slate-400 shadow-sm transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/20 focus:outline-none"
+          className="block w-full rounded-2xl border border-slate-200 bg-white/60 px-5 py-3.5 text-slate-800 placeholder-slate-400 shadow-sm transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800/40 dark:text-slate-100 dark:placeholder-slate-500 dark:hover:bg-slate-800 dark:focus:border-indigo-500 dark:focus:bg-slate-800"
           value={email}
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             setEmail(event.target.value)
@@ -79,7 +81,7 @@ const FeedbackForm = () => {
       </div>
       <textarea
         rows={4}
-        className="block w-full rounded-2xl border border-slate-200 bg-white/60 px-5 py-4 text-slate-800 placeholder-slate-400 shadow-sm transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/20 focus:outline-none"
+        className="block w-full px-5 py-4 transition-all border shadow-sm rounded-2xl border-slate-200 bg-white/60 text-slate-800 placeholder-slate-400 hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800/40 dark:text-slate-100 dark:placeholder-slate-500 dark:hover:bg-slate-800 dark:focus:border-indigo-500 dark:focus:bg-slate-800"
         value={feedback}
         onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
           setFeedback(event.target.value)
@@ -91,8 +93,8 @@ const FeedbackForm = () => {
         type="submit"
         className={
           (isLoading
-            ? "cursor-not-allowed bg-slate-400"
-            : "bg-indigo-600 hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-lg active:translate-y-0") +
+            ? "cursor-not-allowed bg-slate-400 dark:bg-slate-700"
+            : "bg-indigo-600 hover:-translate-y-0.5 hover:bg-indigo-700 hover:shadow-lg active:translate-y-0 dark:bg-indigo-500 dark:hover:bg-indigo-400") +
           ` w-full rounded-xl px-10 py-3.5 font-semibold text-white shadow-md transition-all md:w-auto`
         }
         disabled={isLoading}

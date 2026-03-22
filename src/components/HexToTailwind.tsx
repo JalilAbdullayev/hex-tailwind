@@ -1,8 +1,5 @@
 import { useEffect, useState, type ChangeEvent } from "react";
-import {
-  closestTailwindToColor,
-  type TailwindVersion,
-} from "../utils/colors";
+import { closestTailwindToColor, type TailwindVersion } from "../utils/colors";
 import Copy from "./Copy";
 import ClipboardIcon from "./ClipboardIcon";
 import { useStore } from "@nanostores/react";
@@ -73,23 +70,23 @@ const HexToTailwind = ({ url }: { url: string }) => {
   return (
     <section
       data-nosnippet
-      className="group relative mb-4 w-full overflow-hidden rounded-4xl border border-indigo-50 bg-white p-6 shadow-xl shadow-indigo-100/50 transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-100/60 md:p-12"
+      className="relative w-full p-6 mb-4 overflow-hidden transition-all duration-300 bg-white border shadow-xl group rounded-4xl border-indigo-50 shadow-indigo-100/50 hover:shadow-2xl hover:shadow-indigo-100/60 md:p-12 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none"
     >
-      <div className="pointer-events-none absolute top-0 right-0 -mt-20 -mr-20 h-64 w-64 rounded-full bg-indigo-50/80 opacity-70 blur-3xl transition-opacity group-hover:opacity-100"></div>
-      <div className="pointer-events-none absolute bottom-0 left-0 -mb-20 -ml-20 h-64 w-64 rounded-full bg-purple-50/80 opacity-70 blur-3xl transition-opacity group-hover:opacity-100"></div>
-      <div className="relative z-10 grid grid-cols-1 items-start gap-x-8 gap-y-8 md:grid-cols-2 lg:gap-x-16">
+      <div className="absolute top-0 right-0 w-64 h-64 -mt-20 -mr-20 transition-opacity rounded-full pointer-events-none bg-indigo-50/80 opacity-70 blur-3xl group-hover:opacity-100 dark:bg-indigo-900/20"></div>
+      <div className="absolute bottom-0 left-0 w-64 h-64 -mb-20 -ml-20 transition-opacity rounded-full pointer-events-none bg-purple-50/80 opacity-70 blur-3xl group-hover:opacity-100 dark:bg-purple-900/20"></div>
+      <div className="relative z-10 grid items-start grid-cols-1 gap-x-8 gap-y-8 md:grid-cols-2 lg:gap-x-16">
         <div className="space-y-4">
           <label
-            className="block pl-1 text-sm font-bold tracking-widest text-slate-400 uppercase"
+            className="block pl-1 text-sm font-bold tracking-widest uppercase text-slate-400"
             htmlFor="colorcode"
           >
             Input Color (HEX, RGB, HSL...)
           </label>
-          <div className="group/input relative">
+          <div className="relative group/input">
             <input
               id="colorcode"
               type="text"
-              className="block w-full rounded-2xl border-2 border-slate-100 bg-slate-50/50 px-4 py-4 font-mono text-2xl font-bold text-slate-800 uppercase shadow-sm transition-all placeholder:text-slate-300 hover:border-slate-200 focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:outline-none"
+              className="block w-full px-4 py-4 font-mono text-2xl font-bold uppercase transition-all border-2 shadow-sm rounded-2xl border-slate-100 bg-slate-50/50 text-slate-800 placeholder:text-slate-300 hover:border-slate-200 focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:outline-none dark:border-slate-800 dark:bg-slate-950/50 dark:text-slate-100 dark:placeholder:text-slate-700 dark:hover:border-slate-700 dark:focus:border-indigo-500 dark:focus:bg-slate-950"
               value={colorInput}
               onChange={handleColorInputChange}
               placeholder="3B82F6 or rgb(59, 130, 246)"
@@ -97,17 +94,17 @@ const HexToTailwind = ({ url }: { url: string }) => {
           </div>
         </div>
         <div className="space-y-4">
-          <p className="block pl-1 text-sm font-bold tracking-widest text-slate-400 uppercase">
+          <p className="block pl-1 text-sm font-bold tracking-widest uppercase text-slate-400">
             Tailwind Match
           </p>
-          <div className="flex min-h-16 flex-col justify-center px-1">
+          <div className="flex flex-col justify-center px-1 min-h-16">
             {closestTailwind ? (
-              <div className="space-y-3 font-mono text-lg font-bold text-slate-700">
-                <div className="group/copy flex items-center gap-3">
-                  <span className="rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-1.5 text-indigo-700 shadow-sm transition-transform hover:scale-[1.02]">
+              <div className="space-y-3 font-mono text-lg font-bold text-slate-700 dark:text-slate-300">
+                <div className="flex items-center gap-3 group/copy">
+                  <span className="rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-1.5 text-indigo-700 shadow-sm transition-transform hover:scale-[1.02] dark:border-indigo-900/50 dark:bg-indigo-900/30 dark:text-indigo-300">
                     {closestTailwind.tailwind}
                   </span>
-                  <div className="text-slate-400 opacity-0 transition-opacity duration-200 group-hover/copy:opacity-100 hover:text-indigo-600">
+                  <div className="transition-opacity duration-200 opacity-0 text-slate-400 group-hover/copy:opacity-100 hover:text-indigo-600 dark:text-slate-500 dark:hover:text-indigo-400">
                     <Copy
                       onClick={createCopyToClipboardFunction(
                         closestTailwind.tailwind,
@@ -117,11 +114,11 @@ const HexToTailwind = ({ url }: { url: string }) => {
                     </Copy>
                   </div>
                 </div>
-                <div className="group/copy flex items-center gap-3">
-                  <span className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-1.5 text-slate-600 shadow-sm transition-transform hover:scale-[1.02]">
+                <div className="flex items-center gap-3 group/copy">
+                  <span className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-1.5 text-slate-600 shadow-sm transition-transform hover:scale-[1.02] dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-400">
                     #{closestTailwind.hex.toUpperCase()}
                   </span>
-                  <div className="text-slate-400 opacity-0 transition-opacity duration-200 group-hover/copy:opacity-100 hover:text-indigo-600">
+                  <div className="transition-opacity duration-200 opacity-0 text-slate-400 group-hover/copy:opacity-100 hover:text-indigo-600 dark:text-slate-500 dark:hover:text-indigo-400">
                     <Copy
                       onClick={createCopyToClipboardFunction(
                         "#" + closestTailwind.hex.toUpperCase(),
@@ -133,30 +130,30 @@ const HexToTailwind = ({ url }: { url: string }) => {
                 </div>
               </div>
             ) : (
-              <span className="py-2 font-mono text-3xl font-bold text-slate-300">
+              <span className="py-2 font-mono text-3xl font-bold text-slate-300 dark:text-slate-800">
                 ...
               </span>
             )}
           </div>
         </div>
         {/* Color comparison panel with checkerboard for contrast */}
-        <div className="relative col-span-1 mt-2 mb-2 flex h-32 w-full overflow-hidden rounded-3xl border-2 border-slate-200/60 shadow-inner md:col-span-2 md:h-40">
-          <div className="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-100 bg-white/90 px-3 py-1 text-xs font-bold tracking-widest text-slate-400 uppercase shadow shadow-black/5 backdrop-blur">
+        <div className="relative flex w-full h-32 col-span-1 mt-2 mb-2 overflow-hidden border-2 shadow-inner rounded-3xl border-slate-200/60 md:col-span-2 md:h-40 dark:border-slate-800">
+          <div className="absolute z-10 px-3 py-1 text-xs font-bold tracking-widest uppercase -translate-x-1/2 -translate-y-1/2 border rounded-full shadow top-1/2 left-1/2 border-slate-100 bg-white/90 text-slate-400 shadow-black/5 backdrop-blur dark:border-slate-800 dark:bg-slate-900/90 dark:text-slate-500">
             VS
           </div>
           {/* Left swatch: input color */}
-          <div className="relative h-full w-1/2">
+          <div className="relative w-1/2 h-full">
             <div
               className="absolute inset-0"
               style={{ ...checkerboardStyle }}
             ></div>
             <div
-              className="absolute inset-0 border-r border-slate-200/40 transition-colors duration-300"
+              className="absolute inset-0 transition-colors duration-300 border-r border-slate-200/40 dark:border-slate-800/40"
               style={{ backgroundColor: inputBgColor }}
             ></div>
           </div>
           {/* Right swatch: tailwind match */}
-          <div className="relative h-full w-1/2">
+          <div className="relative w-1/2 h-full">
             <div
               className="absolute inset-0"
               style={{ ...checkerboardStyle }}
@@ -167,32 +164,32 @@ const HexToTailwind = ({ url }: { url: string }) => {
             ></div>
           </div>
         </div>
-        <div className="col-span-1 mt-2 flex flex-col items-start justify-between gap-5 rounded-2xl border border-slate-100 bg-slate-50/80 p-6 sm:flex-row sm:items-center md:col-span-2">
+        <div className="flex flex-col items-start justify-between col-span-1 gap-5 p-6 mt-2 border rounded-2xl border-slate-100 bg-slate-50/80 sm:flex-row sm:items-center md:col-span-2 dark:border-slate-800 dark:bg-slate-950/50">
           <div className="flex flex-wrap items-center gap-3 text-base md:text-lg">
-            <span className="font-medium text-slate-500">
+            <span className="font-medium text-slate-500 dark:text-slate-400">
               Difference visible?
             </span>{" "}
             {closestTailwind ? (
-              <div className="rounded-lg border border-indigo-100 bg-indigo-100/50 px-3 py-1 text-indigo-800">
+              <div className="px-3 py-1 text-indigo-800 border border-indigo-100 rounded-lg bg-indigo-100/50 dark:border-indigo-900/50 dark:bg-indigo-900/30 dark:text-indigo-300">
                 {ColorDifferenceResult(closestTailwind.diff)}
               </div>
             ) : (
-              <span className="text-slate-400">...</span>
+              <span className="text-slate-400 dark:text-slate-700">...</span>
             )}
             {/* Tailwind version selector */}
             <div className="flex items-center gap-2 ml-auto">
-              <span className="text-sm font-medium text-slate-400">
+              <span className="text-sm font-medium text-slate-400 dark:text-slate-600">
                 Tailwind:
               </span>
-              <div className="inline-flex overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+              <div className="inline-flex overflow-hidden bg-white border shadow-sm rounded-xl border-slate-200 dark:border-slate-800 dark:bg-slate-900">
                 {VERSIONS.map((v) => (
                   <button
                     key={v}
                     onClick={() => setVersion(v)}
                     className={`px-3 py-1.5 text-sm font-semibold transition-all ${
                       version === v
-                        ? "bg-indigo-600 text-white shadow-sm"
-                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-700"
+                        ? "bg-indigo-600 text-white shadow-sm dark:bg-indigo-500"
+                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                     }`}
                   >
                     {v.toUpperCase()}
@@ -201,7 +198,7 @@ const HexToTailwind = ({ url }: { url: string }) => {
               </div>
             </div>
           </div>
-          <div className="relative flex cursor-pointer items-center gap-2 rounded-xl border border-indigo-50 bg-white px-5 py-3 text-sm font-medium tracking-wide text-indigo-600 shadow-sm transition-all hover:-translate-y-0.5 hover:text-indigo-800 hover:shadow active:translate-y-0">
+          <div className="relative flex cursor-pointer items-center gap-2 rounded-xl border border-indigo-50 bg-white px-5 py-3 text-sm font-medium tracking-wide text-indigo-600 shadow-sm transition-all hover:-translate-y-0.5 hover:text-indigo-800 hover:shadow active:translate-y-0 dark:border-slate-800 dark:bg-slate-900 dark:text-indigo-400 dark:hover:text-indigo-300 dark:hover:shadow-black/20">
             <Copy onClick={createCopyToClipboardFunction(urlToCopy)}>
               <div className="flex items-center gap-2 before:absolute before:inset-0">
                 <ClipboardIcon />

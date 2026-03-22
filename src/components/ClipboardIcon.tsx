@@ -9,7 +9,7 @@ const ClipboardIcon = () => (
     <g
       fill="none"
       fillRule="evenodd"
-      stroke="#000000"
+      stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
       transform="translate(4 3)"
