@@ -4,7 +4,7 @@ import tailwindcss from "@tailwindcss/vite";
 
 // https://astro.build/config
 export default defineConfig({
-  site: "https://hextotailwind.netlify.app",
+  site: "https://colortotailwind.netlify.app",
   integrations: [react()],
   vite: {
     plugins: [tailwindcss()],

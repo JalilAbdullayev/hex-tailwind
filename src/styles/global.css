@@ -16,3 +16,7 @@
 .container {
   @apply mx-auto max-sm:px-4 sm:max-w-135 md:max-w-180 lg:max-w-240 xl:max-w-285 2xl:max-w-330;
 }
+
+button {
+  @apply cursor-pointer;
+}

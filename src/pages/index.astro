@@ -5,9 +5,9 @@ import FeedbackForm from "../components/FeedbackForm";
 import Link from "../components/Link.astro";
 import HexCodeInUrlNotifier from "../components/HexInUrlNotifier";
 
-const title = "HEX to Tailwind";
+const title = "Color to Tailwind";
 const description =
-  "Find the closest Tailwind color for a given HEX code. A simple online web app that is completely free.";
+  "Find the closest Tailwind color for a given color. A simple online web app that is completely free.";
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const image = "/meta.webp";
 ---
@@ -32,7 +32,7 @@ const image = "/meta.webp";
     <meta property="og:url" content={Astro.url} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:site_name" content="HEX to Tailwind" />
+    <meta property="og:site_name" content="Color to Tailwind" />
     <meta property="og:image" content={new URL(image, Astro.url)} />
 
     <!-- Twitter -->
@@ -50,10 +50,10 @@ const image = "/meta.webp";
         <h1
           class="mb-5 text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-purple-600 sm:text-6xl md:text-7xl drop-shadow-sm"
         >
-          HEX to Tailwind
+          Color to Tailwind
         </h1>
         <p class="mx-auto text-lg leading-relaxed md:text-xl text-slate-600">
-          Convert your HEX code to the closest color in the{" "}
+          Convert your color (HEX, RGB, HSL...) to the closest color in the{" "}
           <Link url="https://tailwindcss.com/docs/colors">
             <span
               class="font-semibold text-indigo-500 underline transition-colors hover:text-indigo-600 decoration-indigo-200 underline-offset-4"
@@ -74,15 +74,19 @@ const image = "/meta.webp";
           </h2>
           <div class="space-y-4 leading-relaxed text-slate-600">
             <p>
-              Type (or paste) your HEX code in the input box. The hashtag is
-              optional, so <code
+              Type (or paste) your color code in the input box. We support HEX,
+              RGB, HSL, and named colors. The hashtag is optional for hex, so <code
                 class="bg-slate-100 text-indigo-600 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
               >
                 #3B82F6
-              </code> or <code
+              </code>, <code
                 class="bg-slate-100 text-indigo-600 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
               >
                 3B82F6
+              </code>, or <code
+                class="bg-slate-100 text-indigo-600 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
+              >
+                rgb(59, 130, 246)
               </code> work perfectly.
             </p>
             <p>
@@ -93,10 +97,11 @@ const image = "/meta.webp";
               as the human eye perceives them.
             </p>
             <p>
-              Copy the original HEX, the matched HEX, or the Tailwind class name
-              with a single click. We also let you know if the difference
-              between your color and the Tailwind color is actually visible (<span
-                class="font-medium text-slate-700">Delta E > 1</span
+              Copy the original color input, the matched HEX, or the Tailwind
+              class name with a single click. We also let you know if the
+              difference between your color and the Tailwind color is actually
+              visible (<span class="font-medium text-slate-700"
+                >Delta E > 1</span
               >).
             </p>
           </div>
@@ -123,6 +128,10 @@ const image = "/meta.webp";
               </h3>
               <p>This fork has been supercharged for the modern web:</p>
               <ul class="pl-5 space-y-2 list-disc">
+                <li>
+                  <strong class="text-slate-800">Extended Color Support:</strong> Supports
+                  RGB, HSL, and named colors in addition to standard HEX codes.
+                </li>
                 <li>
                   <strong class="text-slate-800">Tailwind v4 Ready:</strong> Fully
                   updated to support the latest V4 color palettes and syntax.

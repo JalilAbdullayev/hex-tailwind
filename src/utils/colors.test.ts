@@ -1,6 +1,5 @@
 import { expect, test } from "vitest";
-
-import { closestTailwindToHex, hexToRgb, normalizeHex } from "./colors";
+import { closestTailwindToColor, hexToRgb, normalizeHex } from "./colors";
 
 test.each([
   ["fff", "ffffff"],
@@ -19,12 +18,14 @@ test.each([
 test.each([
   ["000000", { tailwind: "black", hex: "000000", truncatedDiff: 0 }],
   ["ffffff", { tailwind: "white", hex: "ffffff", truncatedDiff: 0 }],
-  ["93c5fd", { tailwind: "blue-300", hex: "93c5fd", truncatedDiff: 0 }],
-  ["701a75", { tailwind: "fuchsia-900", hex: "701a75", truncatedDiff: 0 }],
-  ["9101ec", { tailwind: "purple-600", hex: "9333ea", truncatedDiff: 4 }],
-  ["123c2d", { tailwind: "emerald-950", hex: "022c22", truncatedDiff: 5 }],
-])("closestTailwindToHex(%s) -> %j", (input, expected) => {
-  const closestTailwind = closestTailwindToHex(input);
+  ["93c5fd", { tailwind: "blue-300", hex: "8ec5ff", truncatedDiff: 0 }],
+  ["701a75", { tailwind: "fuchsia-900", hex: "721378", truncatedDiff: 1 }],
+  ["9101ec", { tailwind: "purple-600", hex: "9810fa", truncatedDiff: 2 }],
+  ["123c2d", { tailwind: "emerald-950", hex: "002c22", truncatedDiff: 5 }],
+  ["rgb(0, 0, 0)", { tailwind: "black", hex: "000000", truncatedDiff: 0 }],
+  ["hsl(0, 0%, 100%)", { tailwind: "white", hex: "ffffff", truncatedDiff: 0 }],
+])("closestTailwindToColor(%s) -> %j", (input, expected) => {
+  const closestTailwind = closestTailwindToColor(input);
 
   expect(closestTailwind.tailwind).toBe(expected.tailwind);
   expect(closestTailwind.hex).toBe(expected.hex);

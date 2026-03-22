@@ -88,8 +88,13 @@ const componentToHex = (c: number) => {
 const rgbToHex = (rgb: Rgb) =>
   componentToHex(rgb.R) + componentToHex(rgb.G) + componentToHex(rgb.B);
 
-export const closestTailwindToHex = (hex: string) => {
-  const normalizedHex = normalizeHex(hex);
+export const closestTailwindToColor = (colorInput: string) => {
+  const hex = formatHex(colorInput);
+  if (!hex) {
+    throw Error("invalid color");
+  }
+
+  const normalizedHex = hex.slice(1); // remove '#'
   const gotRgb = hexToRgb(normalizedHex);
 
   const closestTailwindRgb: Rgb = closest(gotRgb, TailwindRgbColors);
@@ -112,15 +117,4 @@ export const closestTailwindToHex = (hex: string) => {
   };
 };
 
-export const normalizeHex = (hex: string) => {
-  let normalizedHex = hex;
-
-  if (normalizedHex.length == 3) {
-    normalizedHex = normalizedHex
-      .split("")
-      .map((x) => x + x)
-      .join("");
-  }
-
-  return normalizedHex;
-};
+export const normalizeHex = (hex: string) => formatHex(hex)?.slice(1) || hex;
