@@ -140,10 +140,10 @@ const ColorToTailwind = ({ url }: { url: string }) => {
   return (
     <section
       data-nosnippet
-      className="relative mb-4 w-full overflow-hidden rounded-[2rem] border border-indigo-100 bg-white p-6 shadow-xl shadow-indigo-100/40 transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-100/60 md:p-10 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none"
+      className="relative mb-4 w-full overflow-hidden rounded-4xl border border-indigo-100 bg-white p-6 shadow-xl shadow-indigo-100/40 transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-100/60 md:p-10 dark:border-slate-800 dark:bg-slate-900 dark:shadow-none"
     >
-      <div className="pointer-events-none absolute top-0 right-0 -mt-16 -mr-16 h-64 w-64 rounded-full bg-indigo-100/70 blur-3xl dark:bg-indigo-900/20" />
-      <div className="pointer-events-none absolute bottom-0 left-0 -mb-20 -ml-20 h-72 w-72 rounded-full bg-cyan-100/60 blur-3xl dark:bg-cyan-900/10" />
+      <div className="pointer-events-none absolute inset-e-0 inset-bs-0 -me-16 -mt-16 size-64 rounded-full bg-indigo-100/70 blur-3xl dark:bg-indigo-900/20" />
+      <div className="pointer-events-none absolute inset-s-0 inset-be-0 -ms-20 -mb-20 size-72 rounded-full bg-cyan-100/60 blur-3xl dark:bg-cyan-900/10" />
 
       <div className="relative z-10 space-y-6">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1.25fr)_minmax(0,1fr)]">
@@ -160,22 +160,28 @@ const ColorToTailwind = ({ url }: { url: string }) => {
               value={colorInput}
               onChange={handleColorInputChange}
               placeholder="3B82F6 or rgb(59, 130, 246)"
-              className="block w-full rounded-2xl border-2 border-slate-100 bg-slate-50/80 px-4 py-4 font-mono text-xl font-bold text-slate-800 uppercase shadow-sm transition outline-none focus:border-indigo-400 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-100 dark:focus:border-indigo-500"
+              className="block w-full rounded-2xl border-2 border-slate-100 bg-slate-50/80 px-4 py-4 font-mono text-xl font-bold text-slate-800 uppercase shadow-sm transition-all duration-200 outline-none focus:border-indigo-400 focus:bg-white focus:shadow-lg focus:ring-4 focus:shadow-indigo-500/10 focus:ring-indigo-500/10 dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-100 dark:focus:border-indigo-500"
+              aria-label="Enter a color code (HEX, RGB, HSL)"
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
             />
             <div className="mt-4 flex flex-wrap items-center gap-2">
               <span className="text-sm font-medium text-slate-400">
                 Tailwind version
               </span>
-              <div className="inline-flex overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-950">
+              <div className="inline-flex overflow-hidden rounded-xl border border-slate-200 bg-white p-0.5 shadow-sm dark:border-slate-800 dark:bg-slate-950">
                 {VERSIONS.map((v) => (
                   <button
                     key={v}
                     onClick={() => setVersion(v)}
-                    className={`px-3 py-1.5 text-sm font-semibold transition ${
+                    className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-all duration-200 ${
                       version === v
-                        ? "bg-indigo-600 text-white dark:bg-indigo-500"
-                        : "text-slate-500 hover:bg-slate-50 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
+                        ? "bg-indigo-600 text-white shadow-sm dark:bg-indigo-500"
+                        : "text-slate-500 hover:bg-slate-100 hover:text-slate-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-slate-200"
                     }`}
+                    aria-pressed={version === v}
                   >
                     {v.toUpperCase()}
                   </button>
@@ -259,8 +265,8 @@ const ColorToTailwind = ({ url }: { url: string }) => {
               </p>
             ) : null}
           </div>
-          <div className="relative flex h-36 overflow-hidden rounded-3xl border border-slate-200/70 shadow-inner md:h-44 dark:border-slate-800">
-            <div className="absolute top-1/2 left-1/2 z-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-slate-200 bg-white/90 px-3 py-1 text-xs font-bold tracking-[0.24em] text-slate-500 uppercase shadow dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-400">
+          <div className="relative flex h-48 overflow-hidden rounded-3xl border border-slate-200/70 shadow-inner max-md:flex-col md:h-44 dark:border-slate-800">
+            <div className="absolute inset-bs-1/2 left-1/2 z-10 -translate-1/2 rounded-full border border-slate-200 bg-white/90 px-3 py-1 text-xs font-bold tracking-[0.24em] text-slate-500 uppercase shadow dark:border-slate-700 dark:bg-slate-900/90 dark:text-slate-400">
               VS
             </div>
             <SwatchHalf
@@ -408,10 +414,10 @@ const ColorToTailwind = ({ url }: { url: string }) => {
                         >
                           <span className="flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-left shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 dark:border-slate-800 dark:bg-slate-950">
                             <span
-                              className="block h-6 w-6 rounded-full border border-white/70 shadow-sm"
+                              className="block size-6 rounded-full border border-white/70 shadow-sm"
                               style={{ backgroundColor: `#${textColor.hex}` }}
                             />
-                            <span className="min-w-0">
+                            <span>
                               <span className="block truncate font-mono text-xs font-bold text-slate-800 dark:text-slate-100">
                                 {textColor.tailwind}
                               </span>
@@ -484,7 +490,7 @@ const ColorToTailwind = ({ url }: { url: string }) => {
                       }`}
                     >
                       <ColorDot color={`#${familyColor.hex}`} />
-                      <div className="min-w-0">
+                      <div>
                         <p className="truncate font-mono text-sm font-bold text-slate-800 dark:text-slate-100">
                           {familyColor.tailwind}
                         </p>
@@ -507,12 +513,12 @@ const ColorToTailwind = ({ url }: { url: string }) => {
                       key={`${match.tailwind}-${match.hex}`}
                       className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/80 p-3 dark:border-slate-800 dark:bg-slate-950/50"
                     >
-                      <div className="flex min-w-0 items-center gap-3">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-300">
+                      <div className="flex items-center gap-3">
+                        <span className="flex size-8 items-center justify-center rounded-full bg-slate-100 text-xs font-bold text-slate-500 dark:bg-slate-800 dark:text-slate-300">
                           {index + 1}
                         </span>
                         <ColorDot color={`#${match.hex}`} />
-                        <div className="min-w-0">
+                        <div>
                           <p className="truncate font-mono text-sm font-bold text-slate-800 dark:text-slate-100">
                             {match.tailwind}
                           </p>
@@ -626,7 +632,7 @@ const CopyButton = ({
 
 const IconCopy = ({ onClick }: { onClick: () => Promise<void> }) => (
   <Copy onClick={onClick}>
-    <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition hover:text-indigo-600 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-500 dark:hover:text-indigo-400">
+    <span className="inline-flex size-9 items-center justify-center rounded-xl border border-slate-200 bg-white text-slate-400 transition hover:text-indigo-600 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-500 dark:hover:text-indigo-400">
       <ClipboardIcon />
     </span>
   </Copy>
@@ -634,7 +640,7 @@ const IconCopy = ({ onClick }: { onClick: () => Promise<void> }) => (
 
 const StatBadge = ({ label, value }: { label: string; value: string }) => (
   <span className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-600 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-300">
-    <strong className="mr-2 text-slate-800 dark:text-slate-100">{label}</strong>
+    <strong className="me-2 text-slate-800 dark:text-slate-100">{label}</strong>
     {value}
   </span>
 );
@@ -648,17 +654,17 @@ const SwatchHalf = ({
   label: string;
   value: string;
 }) => (
-  <div className="relative h-full w-1/2">
+  <div className="relative h-1/2 w-full transition-all duration-500 md:h-full md:w-1/2">
     <div className="absolute inset-0" style={checkerboardStyle} />
     <div
-      className="absolute inset-0 transition-colors duration-300"
+      className="absolute inset-0 transition-colors duration-500 ease-out"
       style={{ backgroundColor }}
     />
-    <div className="absolute bottom-3 left-3 rounded-2xl bg-white/85 px-3 py-2 backdrop-blur dark:bg-slate-900/80">
+    <div className="absolute inset-be-3 left-3 rounded-2xl bg-white/90 px-3 py-2 shadow-sm backdrop-blur-sm dark:bg-slate-900/90">
       <p className="text-[11px] font-bold tracking-[0.24em] text-slate-400 uppercase">
         {label}
       </p>
-      <p className="mt-1 font-mono text-sm font-bold text-slate-700 dark:text-slate-200">
+      <p className="mt-1 font-mono text-sm font-bold text-slate-800 dark:text-slate-200">
         {value}
       </p>
     </div>
@@ -756,7 +762,7 @@ const FormatRow = ({
   value: string;
 }) => (
   <div className="flex items-center justify-between gap-3 rounded-2xl border border-slate-200 bg-white/80 px-4 py-3 dark:border-slate-800 dark:bg-slate-950/50">
-    <div className="min-w-0">
+    <div>
       <p className="text-[11px] font-bold tracking-[0.24em] text-slate-400 uppercase">
         {label}
       </p>
@@ -770,7 +776,7 @@ const FormatRow = ({
 
 const ColorDot = ({ color }: { color: string }) => (
   <span
-    className="block h-8 w-8 rounded-full border border-white/70 shadow-sm"
+    className="block size-8 rounded-full border border-white/70 shadow-sm transition-transform duration-200 hover:scale-110"
     style={{ backgroundColor: color }}
   />
 );

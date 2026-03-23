@@ -24,7 +24,7 @@ const ThemeToggle = () => {
   return (
     <button
       onClick={toggleTheme}
-      className="fixed z-50 flex items-center justify-center w-10 h-10 transition-all border shadow-sm top-4 right-4 rounded-xl border-slate-200 bg-white/80 text-slate-600 backdrop-blur-md hover:scale-110 hover:border-indigo-300 hover:text-indigo-600 md:top-6 md:right-6 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:border-indigo-500 dark:hover:text-indigo-400"
+      className="fixed inset-bs-4 inset-e-4 z-50 flex size-10 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-600 shadow-sm backdrop-blur-md transition-all hover:scale-110 hover:border-indigo-300 hover:text-indigo-600 md:inset-bs-6 md:inset-e-6 dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:border-indigo-500 dark:hover:text-indigo-400"
       aria-label="Toggle theme"
     >
       {theme === "light" ? (
