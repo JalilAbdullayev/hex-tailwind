@@ -6,10 +6,7 @@
 //   v3: https://github.com/tailwindlabs/tailwindcss/blob/v3.4.17/src/public/colors.js
 //   v2: same as v3 minus 950 shades and some renamed colors
 
-export type TailwindPalette = Record<
-  string,
-  string | Record<string, string>
->;
+export type TailwindPalette = Record<string, string | Record<string, string>>;
 
 // ── Tailwind v1 (1.x) ──────────────────────────────────────────────────
 export const tailwindV1: TailwindPalette = {

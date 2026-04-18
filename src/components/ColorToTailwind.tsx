@@ -160,7 +160,7 @@ const ColorToTailwind = ({ url }: { url: string }) => {
               value={colorInput}
               onChange={handleColorInputChange}
               placeholder="3B82F6 or rgb(59, 130, 246)"
-              className="block w-full rounded-2xl border-2 border-slate-100 bg-slate-50/80 px-4 py-4 font-mono text-xl font-bold text-slate-800 uppercase shadow-sm transition-all duration-200 outline-none focus:border-indigo-400 focus:bg-white focus:shadow-lg focus:ring-4 focus:shadow-indigo-500/10 focus:ring-indigo-500/10 dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-100 dark:focus:border-indigo-500"
+              className="block w-full rounded-2xl border-2 border-slate-100 bg-slate-50/80 px-4 py-4 font-mono text-xl font-bold text-slate-800 uppercase shadow-sm transition-all duration-200 outline-none focus:border-indigo-400 focus:bg-white focus:shadow-lg focus:ring-4 focus:shadow-indigo-500/10 focus:ring-indigo-500/10 dark:border-slate-800 dark:bg-slate-950/60 dark:text-slate-100 dark:focus:border-indigo-500 dark:focus:bg-slate-900"
               aria-label="Enter a color code (HEX, RGB, HSL)"
               autoComplete="off"
               autoCorrect="off"

@@ -81,7 +81,7 @@ const FeedbackForm = () => {
       </div>
       <textarea
         rows={4}
-        className="block w-full px-5 py-4 transition-all border shadow-sm rounded-2xl border-slate-200 bg-white/60 text-slate-800 placeholder-slate-400 hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800/40 dark:text-slate-100 dark:placeholder-slate-500 dark:hover:bg-slate-800 dark:focus:border-indigo-500 dark:focus:bg-slate-800"
+        className="block w-full rounded-2xl border border-slate-200 bg-white/60 px-5 py-4 text-slate-800 placeholder-slate-400 shadow-sm transition-all hover:bg-white focus:border-indigo-500 focus:bg-white focus:ring-4 focus:ring-indigo-500/20 focus:outline-none dark:border-slate-700 dark:bg-slate-800/40 dark:text-slate-100 dark:placeholder-slate-500 dark:hover:bg-slate-800 dark:focus:border-indigo-500 dark:focus:bg-slate-800"
         value={feedback}
         onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
           setFeedback(event.target.value)
