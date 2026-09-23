@@ -9,6 +9,25 @@ import {
 } from "./tailwind-palettes";
 
 export type TailwindVersion = "v1" | "v2" | "v3" | "v4";
+export type { TailwindPalette };
+
+export type MatchOptions = {
+  customPalette?: TailwindPalette;
+  family?: string;
+};
+
+const UTILITY_PREFIXES = [
+  "bg",
+  "text",
+  "border",
+  "ring",
+  "fill",
+  "stroke",
+  "outline",
+  "from",
+  "via",
+  "to",
+] as const;
 
 type Rgb = { R: number; G: number; B: number };
 type Shade = string | null;
@@ -208,6 +227,56 @@ const getVersionData = (version: TailwindVersion) => {
   return data;
 };
 
+const getMatchData = (
+  version: TailwindVersion,
+  options?: MatchOptions,
+): VersionData => {
+  let data = options?.customPalette
+    ? createVersionData(buildMapFromPalette(options.customPalette))
+    : getVersionData(version);
+
+  if (options?.family) {
+    const familyKey = options.family.toLowerCase();
+    const filtered = data.entries.filter(
+      (entry) => entry.family.toLowerCase() === familyKey,
+    );
+    if (filtered.length > 0) {
+      data = createVersionData(filtered);
+    }
+  }
+
+  return data;
+};
+
+export const getPaletteFamilies = (
+  version: TailwindVersion,
+  customPalette?: TailwindPalette,
+) => {
+  const data = customPalette
+    ? createVersionData(buildMapFromPalette(customPalette))
+    : getVersionData(version);
+
+  return [...data.families.keys()].sort((a, b) => a.localeCompare(b));
+};
+
+export const parseVersionParam = (
+  value?: string | null,
+): TailwindVersion | undefined => {
+  if (!value) return undefined;
+
+  const normalized = value.trim().toLowerCase().replace(/^v/, "");
+  if (
+    normalized === "1" ||
+    normalized === "2" ||
+    normalized === "3" ||
+    normalized === "4"
+  ) {
+    return `v${normalized}` as TailwindVersion;
+  }
+
+  return undefined;
+};
+
 const formatNumber = (value: number, digits = 3) =>
   Number(value.toFixed(digits)).toString();
 
@@ -337,6 +406,7 @@ const createTopMatches = (
 export const closestTailwindToColor = (
   colorInput: string,
   version: TailwindVersion = "v4",
+  options?: MatchOptions,
 ) => {
   const inputFormats = getInputFormats(colorInput);
   const gotRgb = hexToRgb(inputFormats.hex);
@@ -345,7 +415,7 @@ export const closestTailwindToColor = (
     families,
     map: rgbToTailwindMap,
     keys: tailwindRgbColors,
-  } = getVersionData(version);
+  } = getMatchData(version, options);
 
   const closestTailwindRgb: Rgb = closest(gotRgb, tailwindRgbColors);
   const closestTailwindDiff: number = diff(
@@ -416,9 +486,269 @@ export const closestTailwindToColor = (
     variants: {
       background: `bg-${tailwindClass}`,
       border: `border-${tailwindClass}`,
+      fill: `fill-${tailwindClass}`,
+      from: `from-${tailwindClass}`,
+      outline: `outline-${tailwindClass}`,
+      ring: `ring-${tailwindClass}`,
+      stroke: `stroke-${tailwindClass}`,
       text: `text-${tailwindClass}`,
+      to: `to-${tailwindClass}`,
+      via: `via-${tailwindClass}`,
+    },
+  };
+};
+
+export type ColorMatch = ReturnType<typeof closestTailwindToColor>;
+
+const TOKEN_PREFIX_PATTERN = new RegExp(
+  `^(?:dark:)?(?:${UTILITY_PREFIXES.join("|")})-`,
+);
+
+export const parseTokenName = (token: string) => {
+  let name = token.trim().toLowerCase();
+  if (!name) return undefined;
+
+  name = name.replace(TOKEN_PREFIX_PATTERN, "");
+  const [rawName, opacity] = name.split("/");
+  if (!rawName) return undefined;
+
+  const alpha =
+    opacity !== undefined && opacity !== "" && !Number.isNaN(Number(opacity))
+      ? Number(opacity) / 100
+      : undefined;
+
+  return { alpha, name: rawName };
+};
+
+export const lookupTailwindToken = (
+  token: string,
+  version: TailwindVersion = "v4",
+  options?: MatchOptions,
+) => {
+  const parsed = parseTokenName(token);
+  if (!parsed) return undefined;
+
+  const data = options?.customPalette
+    ? createVersionData(buildMapFromPalette(options.customPalette))
+    : getVersionData(version);
+  const entry = data.entries.find(
+    (candidate) => candidate.name.toLowerCase() === parsed.name,
+  );
+  if (!entry) return undefined;
+
+  const colorInput =
+    parsed.alpha !== undefined
+      ? (formatHex8({
+          mode: "rgb",
+          r: entry.rgb.R / 255,
+          g: entry.rgb.G / 255,
+          b: entry.rgb.B / 255,
+          alpha: parsed.alpha,
+        }) ?? `#${entry.hex}`)
+      : `#${entry.hex}`;
+
+  return closestTailwindToColor(colorInput, version, {
+    ...options,
+    family: options?.family ?? entry.family,
+  });
+};
+
+const addPaletteColor = (
+  palette: TailwindPalette,
+  rawName: string,
+  rawValue: string,
+) => {
+  const name = rawName.trim();
+  const value = formatHex(rawValue.trim());
+  if (!name || !value) return;
+
+  const shadeMatch = /^(.+)-(\d{2,3})$/.exec(name);
+  if (shadeMatch) {
+    const family = shadeMatch[1];
+    const shade = shadeMatch[2];
+    if (!family || !shade) return;
+
+    const existing = palette[family];
+    if (typeof existing === "string" || existing === undefined) {
+      palette[family] = {};
+    }
+    (palette[family] as Record<string, string>)[shade] = value;
+    return;
+  }
+
+  palette[name] = value;
+};
+
+const coercePalette = (value: unknown): TailwindPalette | undefined => {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return undefined;
+  }
+
+  const palette: TailwindPalette = {};
+
+  for (const [key, raw] of Object.entries(value as Record<string, unknown>)) {
+    if (typeof raw === "string") {
+      addPaletteColor(palette, key, raw);
+      continue;
+    }
+
+    if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+      for (const [shade, shadeValue] of Object.entries(
+        raw as Record<string, unknown>,
+      )) {
+        if (typeof shadeValue === "string") {
+          addPaletteColor(palette, `${key}-${shade}`, shadeValue);
+        }
+      }
+    }
+  }
+
+  return Object.keys(palette).length > 0 ? palette : undefined;
+};
+
+export const parseCustomPalette = (text: string) => {
+  const trimmed = text.trim();
+  if (!trimmed) return undefined;
+
+  try {
+    const fromJson = coercePalette(JSON.parse(trimmed));
+    if (fromJson) return fromJson;
+  } catch {
+    // Not JSON — try the other formats.
+  }
+
+  const themePalette: TailwindPalette = {};
+  const themePattern = /--color-([a-zA-Z0-9-]+)\s*:\s*([^;}]+)/g;
+  for (const match of trimmed.matchAll(themePattern)) {
+    const tokenName = match[1];
+    const tokenValue = match[2];
+    if (!tokenName || !tokenValue) continue;
+    addPaletteColor(themePalette, tokenName, tokenValue);
+  }
+  if (Object.keys(themePalette).length > 0) return themePalette;
+
+  const linePalette: TailwindPalette = {};
+  const linePattern = /^\s*([a-zA-Z][\w-]*)\s*[:=]\s*(.+?)\s*$/;
+  for (const line of trimmed.split(/[\n,;]+/)) {
+    const match = linePattern.exec(line);
+    if (!match?.[1] || !match[2]) continue;
+    addPaletteColor(linePalette, match[1], match[2]);
+  }
+
+  return Object.keys(linePalette).length > 0 ? linePalette : undefined;
+};
+
+export const parseBatchInputs = (text: string) => {
+  const trimmed = text.trim();
+  if (!trimmed) return [];
+
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (Array.isArray(parsed)) {
+      return parsed.map((item) => String(item).trim()).filter(Boolean);
+    }
+  } catch {
+    // Fall through to delimiter splitting.
+  }
+
+  return trimmed
+    .split(/[\n,;]+/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+};
+
+const rotateHue = (colorInput: string, degrees: number) => {
+  const hsl = hslConverter(parse(colorInput));
+  if (!hsl) return undefined;
+
+  const nextHue = ((((hsl.h ?? 0) + degrees) % 360) + 360) % 360;
+  return formatHex({
+    mode: "hsl",
+    h: nextHue,
+    s: hsl.s,
+    l: hsl.l,
+    ...(hsl.alpha === undefined ? {} : { alpha: hsl.alpha }),
+  });
+};
+
+const desaturate = (
+  colorInput: string,
+  saturation = 0.08,
+  lightness = 0.55,
+) => {
+  const hsl = hslConverter(parse(colorInput));
+  if (!hsl) return undefined;
+
+  return formatHex({
+    mode: "hsl",
+    h: hsl.h ?? 0,
+    s: Math.min(hsl.s, saturation),
+    l: lightness,
+    ...(hsl.alpha === undefined ? {} : { alpha: hsl.alpha }),
+  });
+};
+
+export const buildBrandKit = (
+  colorInput: string,
+  version: TailwindVersion = "v4",
+  options?: MatchOptions,
+) => {
+  const complementaryHex = rotateHue(colorInput, 180);
+  const analogousAHex = rotateHue(colorInput, 30);
+  const analogousBHex = rotateHue(colorInput, -30);
+  const neutralHex = desaturate(colorInput);
+
+  if (!complementaryHex || !analogousAHex || !analogousBHex || !neutralHex) {
+    throw Error("couldn't build brand kit");
+  }
+
+  const matchRole = (hex: string) =>
+    closestTailwindToColor(hex, version, options);
+
+  return {
+    analogous: [
+      {
+        hex: analogousAHex,
+        match: matchRole(analogousAHex),
+        role: "analogous",
+      },
+      {
+        hex: analogousBHex,
+        match: matchRole(analogousBHex),
+        role: "analogous",
+      },
+    ],
+    complementary: {
+      hex: complementaryHex,
+      match: matchRole(complementaryHex),
+      role: "complementary" as const,
+    },
+    neutral: {
+      hex: neutralHex,
+      match: matchRole(neutralHex),
+      role: "neutral" as const,
+    },
+    source: {
+      hex: formatHex(colorInput) ?? colorInput,
+      match: closestTailwindToColor(colorInput, version, options),
+      role: "source" as const,
     },
   };
 };
 
 export const normalizeHex = (hex: string) => formatHex(hex)?.slice(1) || hex;
+
+export const resolveColorMatch = (
+  colorInput: string,
+  version: TailwindVersion = "v4",
+  options?: MatchOptions,
+) => {
+  const tokenMatch = lookupTailwindToken(colorInput, version, options);
+  if (tokenMatch) return tokenMatch;
+
+  try {
+    return closestTailwindToColor(colorInput, version, options);
+  } catch {
+    return undefined;
+  }
+};

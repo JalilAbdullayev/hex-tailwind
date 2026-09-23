@@ -1,5 +1,15 @@
 import { expect, test } from "vitest";
-import { closestTailwindToColor, hexToRgb, normalizeHex } from "./colors";
+import {
+  buildBrandKit,
+  closestTailwindToColor,
+  hexToRgb,
+  lookupTailwindToken,
+  normalizeHex,
+  parseBatchInputs,
+  parseCustomPalette,
+  parseVersionParam,
+  resolveColorMatch,
+} from "./colors";
 
 test.each([
   ["fff", "ffffff"],
@@ -123,4 +133,114 @@ test("suggests an arbitrary value when the match is too far off", () => {
     hex: "#123c2d",
     threshold: 4,
   });
+});
+
+test("includes extra utility variants", () => {
+  const result = closestTailwindToColor("#3b82f6", "v3");
+
+  expect(result.variants).toMatchObject({
+    background: "bg-blue-500",
+    fill: "fill-blue-500",
+    from: "from-blue-500",
+    outline: "outline-blue-500",
+    ring: "ring-blue-500",
+    stroke: "stroke-blue-500",
+    text: "text-blue-500",
+    to: "to-blue-500",
+    via: "via-blue-500",
+  });
+});
+
+test("constrains matching to a single family", () => {
+  const unconstrained = closestTailwindToColor("#3b82f6", "v3");
+  const constrained = closestTailwindToColor("#3b82f6", "v3", {
+    family: "red",
+  });
+
+  expect(unconstrained.family).toBe("blue");
+  expect(constrained.family).toBe("red");
+  expect(constrained.tailwind).toMatch(/^red-/);
+});
+
+test("matches against a custom palette", () => {
+  const result = closestTailwindToColor("#3b82f6", "v4", {
+    customPalette: {
+      brand: {
+        500: "#3b82f6",
+      },
+    },
+  });
+
+  expect(result.tailwind).toBe("brand-500");
+  expect(result.family).toBe("brand");
+  expect(result.hex).toBe("3b82f6");
+});
+
+test.each([
+  ["blue-500", "blue-500"],
+  ["bg-slate-200", "slate-200"],
+  ["text-red-500/40", "red-500/40"],
+  ["dark:bg-emerald-700", "emerald-700"],
+])("lookupTailwindToken(%s) -> %s", (token, expected) => {
+  const result = lookupTailwindToken(token, "v3");
+
+  expect(result?.tailwind).toBe(expected);
+  expect(result?.input.hex).toMatch(/^#/);
+});
+
+test("resolveColorMatch accepts tokens and hex values", () => {
+  expect(resolveColorMatch("blue-500", "v3")?.tailwind).toBe("blue-500");
+  expect(resolveColorMatch("#3b82f6", "v3")?.tailwind).toBe("blue-500");
+  expect(resolveColorMatch("not-a-color", "v3")).toBeUndefined();
+});
+
+test("parseCustomPalette accepts JSON, @theme, and name:hex lines", () => {
+  expect(
+    parseCustomPalette('{ "brand": { "500": "#3b82f6" }, "ink": "#111827" }'),
+  ).toEqual({
+    brand: { 500: "#3b82f6" },
+    ink: "#111827",
+  });
+
+  expect(
+    parseCustomPalette(
+      "@theme { --color-brand: #3b82f6; --color-ink: #111827 }",
+    ),
+  ).toEqual({
+    brand: "#3b82f6",
+    ink: "#111827",
+  });
+
+  expect(parseCustomPalette("brand-500: #3b82f6\nink: #111827")).toEqual({
+    brand: { 500: "#3b82f6" },
+    ink: "#111827",
+  });
+});
+
+test("parseBatchInputs splits lists and JSON arrays", () => {
+  expect(parseBatchInputs("#3b82f6, red\n#111827")).toEqual([
+    "#3b82f6",
+    "red",
+    "#111827",
+  ]);
+  expect(parseBatchInputs('["#3b82f6", "blue-500"]')).toEqual([
+    "#3b82f6",
+    "blue-500",
+  ]);
+});
+
+test("parseVersionParam accepts v-prefixed and bare versions", () => {
+  expect(parseVersionParam("v3")).toBe("v3");
+  expect(parseVersionParam("4")).toBe("v4");
+  expect(parseVersionParam("nope")).toBeUndefined();
+});
+
+test("buildBrandKit returns complementary, analogous, and neutral matches", () => {
+  const kit = buildBrandKit("#3b82f6", "v3");
+
+  expect(kit.source.match.tailwind).toBe("blue-500");
+  expect(kit.complementary.hex).toMatch(/^#/);
+  expect(kit.complementary.match.tailwind).toBeTruthy();
+  expect(kit.analogous).toHaveLength(2);
+  expect(kit.neutral.match.tailwind).toBeTruthy();
 });

@@ -37,7 +37,9 @@ const FeedbackForm = () => {
 
   if (submitted) {
     return (
-      <p className="font-bold text-green-700 dark:text-green-400">Submitted!</p>
+      <p className="font-bold text-green-700 dark:text-green-400">
+        Thanks — got it.
+      </p>
     );
   }
 
@@ -45,8 +47,7 @@ const FeedbackForm = () => {
     <form className="space-y-5" onSubmit={handleSubmit}>
       {error && (
         <p className="font-semibold text-red-700 dark:text-red-400">
-          Something went wrong, error message: {error.message}. Please reach out
-          to me{" "}
+          Something went wrong. Please reach out to me{" "}
           <a
             className="underline"
             href="https://linkedin.com/in/jalil-abdullayev/"
@@ -65,7 +66,7 @@ const FeedbackForm = () => {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             setName(event.target.value)
           }
-          placeholder="Your Name"
+          placeholder="Your name"
           required
         />
         <input
@@ -75,7 +76,7 @@ const FeedbackForm = () => {
           onChange={(event: ChangeEvent<HTMLInputElement>) =>
             setEmail(event.target.value)
           }
-          placeholder="Your E-mail"
+          placeholder="Your email"
           required
         />
       </div>
@@ -86,7 +87,7 @@ const FeedbackForm = () => {
         onChange={(event: ChangeEvent<HTMLTextAreaElement>) =>
           setFeedback(event.target.value)
         }
-        placeholder="How can we improve HEX to Tailwind?"
+        placeholder="How can we make Color to Tailwind better?"
         required
       ></textarea>
       <button
@@ -99,7 +100,7 @@ const FeedbackForm = () => {
         }
         disabled={isLoading}
       >
-        {isLoading ? "Submitting..." : "Submit Feedback"}
+        {isLoading ? "Sending..." : "Send feedback"}
       </button>
     </form>
   );

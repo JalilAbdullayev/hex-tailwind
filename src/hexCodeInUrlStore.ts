@@ -1,3 +1,12 @@
 import { atom } from "nanostores";
+import type { TailwindVersion } from "./utils/colors";
 
-export const hexCodeInUrlStore = atom("");
+export type UrlColorState = {
+  color: string;
+  version: TailwindVersion | "";
+};
+
+export const hexCodeInUrlStore = atom<UrlColorState>({
+  color: "",
+  version: "",
+});

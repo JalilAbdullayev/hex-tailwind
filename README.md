@@ -1,37 +1,61 @@
 # Color to Tailwind
 
-A small web app that converts your color code (HEX, RGB, HSL...) to the closest color in the Tailwind color palette.
+Paste a HEX, RGB, or HSL color and get the closest Tailwind CSS token.
+
+**Try it:** [colortotailwind.netlify.app](https://colortotailwind.netlify.app)
+
 Built with Astro and React.
 
-## Requirements
+## What it does
 
-- Node v20
-- [Web3Forms](https://web3forms.com/) for feedback form submissions
+Type or paste a color. The app scores it against the Tailwind palette with Delta E and shows the closest class, how close the match is, and whether white or black text will read on it.
 
-## Notes
+- **Formats:** HEX (3, 4, 6, or 8 characters), RGB/RGBA, HSL/HSLA, named CSS colors, and Tailwind tokens (`blue-500`, `bg-slate-200`)
+- **Alpha:** Colors with opacity (for example `rgba(59, 130, 246, 0.4)` or `#3B82F666`) copy as classes like `blue-500/40`
+- **Picker and image sample:** Native color input, or drop / paste / upload a screenshot and click a pixel
+- **Tailwind v1–v4:** Switch palettes; share links keep `?hex=` and `?v=`
+- **Family filter and custom palettes:** Limit matching to one hue family, or paste your own JSON, `@theme`, or `name: hex` list
+- **Copy utilities:** `bg-`, `text-`, `border-`, `ring-`, `fill-`, `stroke-`, `outline-`, and gradient classes, plus batch convert
+- **Contrast and nearby matches:** WCAG scores, nearest three matches, shade family, and a dark-mode pair
+- **Brand kit:** Complementary, analogous, and neutral Tailwind matches from the current color
 
-The [colors.ts](./src/utils/colors.ts) file holds the Color to Tailwind algorithm. See
-the [How it works?](https://colortotailwind.netlify.app/) section for what the algorithm does.
+## Run locally
 
-The project uses Nano Stores to [share state](https://docs.astro.build/en/recipes/sharing-state-islands/)
-between React components. With this, the site can pass URL path attributes to the components without
-wrapping it entirely in React.
+You need Node 20.
 
-## Features
+```sh
+npm install
+npm run dev
+```
 
-- **Multi-format input:** HEX (3, 4, 6, 8-character), RGB, RGBA, HSL, HSLA, and named CSS colors
-- **Alpha / Opacity:** Colors with alpha (e.g. `rgba(59, 130, 246, 0.4)`, `#3B82F666`) output Tailwind classes with opacity (e.g. `blue-500/40`)
-- **Tailwind v1–v4 palettes:** Toggle between Tailwind versions with a single click
-- **SEO optimized:** Descriptive meta tags; `data-nosnippet` on dynamic content
-- **Contrast-aware preview:** Checkerboard pattern behind color swatches for visibility
+The app starts at [localhost:4321](http://localhost:4321). Matching works without any extra setup.
 
-## Commands
+The feedback form is optional. To enable it, add a [Web3Forms](https://web3forms.com/) access key as `PUBLIC_FORM_ACCESS_KEY` in a `.env` file.
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Scripts
+
+| Command             | Action                                    |
+| :------------------ | :---------------------------------------- |
+| `npm install`       | Install dependencies                      |
+| `npm run dev`       | Dev server at `localhost:4321`            |
+| `npm run build`     | Type-check, then build to `./dist/`       |
+| `npm run preview`   | Preview the production build              |
+| `npm test`          | Run Vitest                                |
+| `npm run format`    | Format files with Prettier                |
+| `npm run astro ...` | Astro CLI (`astro add`, `astro check`, …) |
+
+## How matching works
+
+The algorithm lives in [src/utils/colors.ts](./src/utils/colors.ts). It picks the closest Tailwind color with Delta E — a score for how different two colors look.
+
+Share links pass the color and Tailwind version through the URL. [Nano Stores](https://docs.astro.build/en/recipes/sharing-state-islands/) move that state between Astro and the React islands without wrapping the whole page in React.
+
+The on-site [How it works](https://colortotailwind.netlify.app/#how-it-works) section walks through the same idea in fewer words.
+
+## Credits
+
+This is a fork of [Mihail](https://github.com/mihailthebuilder/hex-tailwind)’s [Hex to Tailwind](https://hextotailwind.com/).
+
+## License
+
+[MIT](./LICENSE)

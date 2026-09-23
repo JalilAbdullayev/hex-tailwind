@@ -8,7 +8,6 @@ import ThemeToggle from "../components/ThemeToggle";
 
 const title =
   "Color to Tailwind — Convert HEX, RGB, HSL to Tailwind CSS Colors";
-const ogTitle = "Color to Tailwind";
 const description =
   "Find the closest Tailwind CSS color for any HEX, RGB, or HSL value. A free online converter with support for Tailwind v1–v4 palettes.";
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
@@ -33,7 +32,7 @@ const image = "/meta.webp";
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content={Astro.url} />
-    <meta property="og:title" content={ogTitle} />
+    <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:site_name" content="Color to Tailwind" />
     <meta property="og:image" content={new URL(image, Astro.url)} />
@@ -41,7 +40,7 @@ const image = "/meta.webp";
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={Astro.url} />
-    <meta property="twitter:title" content={ogTitle} />
+    <meta property="twitter:title" content={title} />
     <meta property="twitter:description" content={description} />
     <meta property="twitter:image" content={new URL(image, Astro.url)} />
 
@@ -70,32 +69,46 @@ const image = "/meta.webp";
   <body
     class="min-h-screen overflow-x-hidden font-sans antialiased transition-colors duration-300 bg-linear-to-br from-indigo-50 via-white to-purple-50 text-slate-900 selection:bg-indigo-100 selection:text-indigo-900 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 dark:text-slate-100 dark:selection:bg-indigo-500/30 dark:selection:text-indigo-200"
   >
-    <ThemeToggle client:load />
-    <main class="container p-4 mt-8 mb-24 space-y-8 md:mt-16 md:space-y-12">
-      <section class="mb-4 text-center md:mb-12">
-        <h1
-          class="mb-5 text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 sm:text-6xl md:text-7xl drop-shadow-sm"
+    <header
+      class="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-md dark:border-indigo-900/40 dark:bg-slate-950/70"
+    >
+      <div class="container flex items-center justify-between px-4 py-3">
+        <a
+          href="/"
+          class="text-sm font-bold tracking-tight text-slate-800 dark:text-slate-100"
         >
           Color to Tailwind
+        </a>
+        <ThemeToggle client:load />
+      </div>
+    </header>
+    <main class="container p-4 mt-8 mb-24 space-y-8 md:mt-12 md:space-y-12">
+      <section class="mb-4 text-center md:mb-8">
+        <h1 class="mb-4">
+          <span
+            class="block text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-linear-to-r from-indigo-600 to-purple-600 dark:from-indigo-400 dark:to-purple-400 sm:text-6xl md:text-7xl drop-shadow-sm"
+          >
+            Color to Tailwind
+          </span>
+          <span
+            class="mt-3 block text-lg font-semibold tracking-tight text-slate-600 sm:text-xl md:text-2xl dark:text-slate-400"
+          >
+            Convert HEX, RGB, HSL to Tailwind CSS Colors
+          </span>
         </h1>
-        <p
-          class="mx-auto text-lg leading-relaxed md:text-xl text-slate-600 dark:text-slate-400"
+        <a
+          href="#how-it-works"
+          class="text-sm font-semibold text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300"
         >
-          Convert your color (HEX, RGB, HSL...) to the closest color in the{" "}
-          <Link url="https://tailwindcss.com/docs/colors">
-            <span
-              class="font-semibold text-indigo-500 underline transition-colors hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 decoration-indigo-200 dark:decoration-indigo-900 underline-offset-4"
-            >
-              Tailwind color palette
-            </span>
-          </Link>.
-        </p>
+          How it works
+        </a>
       </section>
       <ColorToTailwind client:load url={canonicalURL.toString()} />
       <HexCodeInUrlNotifier client:only="react" />
       <div class="grid grid-cols-1 gap-8 mt-12 md:grid-cols-2">
         <section
-          class="p-8 transition-shadow duration-300 border border-white shadow-xl dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-indigo-100/40 dark:shadow-none rounded-3xl md:p-10 hover:shadow-2xl"
+          id="how-it-works"
+          class="p-8 transition-shadow duration-300 border border-white shadow-xl dark:border-indigo-900/50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-indigo-100/40 dark:shadow-lg dark:shadow-indigo-950/40 rounded-3xl md:p-10 hover:shadow-2xl"
         >
           <h2
             class="mb-5 text-2xl font-bold tracking-tight text-slate-800 dark:text-slate-100"
@@ -107,7 +120,7 @@ const image = "/meta.webp";
           >
             <p>
               Type (or paste) your color code in the input box. We support HEX,
-              RGB, HSL, and named colors. The hashtag is optional for hex, so <code
+              RGB, HSL, named colors, and Tailwind tokens. The hashtag is optional for hex, so <code
                 class="bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
               >
                 #3B82F6
@@ -119,132 +132,32 @@ const image = "/meta.webp";
                 class="bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
               >
                 rgb(59, 130, 246)
-              </code> work perfectly.
+              </code> all work.
             </p>
             <p>
-              We'll instantly calculate the closest Tailwind CSS match using the <span
-                class="font-medium text-slate-700 dark:text-slate-300"
-              >
-                Delta E algorithm
-              </span>
-              , which measures the mathematical difference between colors exactly
-              as the human eye perceives them.
+              We pick the closest Tailwind color with <span
+                class="font-medium text-slate-700 dark:text-slate-300">Delta E</span>,
+              a score for how different two colors look. If that score is above
+              1, most people can see the gap.
             </p>
             <p>
-              Copy the original color input, the matched HEX, or the Tailwind
-              class name with a single click. We also let you know if the
-              difference between your color and the Tailwind color is actually
-              visible (<span
-                class="font-medium text-slate-700 dark:text-slate-300"
-              >
-                Delta E > 1
-              </span>).
+              You get the closest token, how close the match is, and whether
+              white or black text will read on it. Click to copy the class, the
+              HEX, or a share link.
             </p>
-            <div class="pt-2">
-              <h3
-                class="mb-4 text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100"
-              >
-                What you get back
-              </h3>
-              <div class="grid gap-3 sm:grid-cols-3">
-                <div
-                  class="rounded-2xl border border-indigo-100 bg-indigo-50/80 p-4 dark:border-indigo-900/40 dark:bg-indigo-950/30"
-                >
-                  <p
-                    class="text-xs font-bold tracking-[0.24em] uppercase text-indigo-500 dark:text-indigo-300"
-                  >
-                    Match
-                  </p>
-                  <p
-                    class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400"
-                  >
-                    The closest Tailwind token, quick-copy utility variants, and
-                    an arbitrary-value fallback when the palette match is not
-                    close enough.
-                  </p>
-                </div>
-                <div
-                  class="rounded-2xl border border-cyan-100 bg-cyan-50/80 p-4 dark:border-cyan-900/40 dark:bg-cyan-950/30"
-                >
-                  <p
-                    class="text-xs font-bold tracking-[0.24em] uppercase text-cyan-600 dark:text-cyan-300"
-                  >
-                    Analysis
-                  </p>
-                  <p
-                    class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400"
-                  >
-                    Delta E visibility, nearest 3 matches, full shade-family
-                    preview, and dark-mode pair suggestions for the selected
-                    color family.
-                  </p>
-                </div>
-                <div
-                  class="rounded-2xl border border-emerald-100 bg-emerald-50/80 p-4 dark:border-emerald-900/40 dark:bg-emerald-950/30"
-                >
-                  <p
-                    class="text-xs font-bold tracking-[0.24em] uppercase text-emerald-600 dark:text-emerald-300"
-                  >
-                    Accessibility
-                  </p>
-                  <p
-                    class="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-400"
-                  >
-                    WCAG contrast scores against white and black text plus AA
-                    and AAA pass-fail indicators so you can evaluate readability
-                    immediately.
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div class="pt-2">
-              <h3
-                class="mb-4 text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100"
-              >
-                Best results workflow
-              </h3>
-              <ol class="space-y-3">
-                <li class="flex gap-3">
-                  <span
-                    class="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300"
-                  >
-                    1
-                  </span>
-                  <p class="text-slate-600 dark:text-slate-400">
-                    Paste the real source color first, not the color you think
-                    is closest. This keeps the Delta E comparison honest.
-                  </p>
-                </li>
-                <li class="flex gap-3">
-                  <span
-                    class="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300"
-                  >
-                    2
-                  </span>
-                  <p class="text-slate-600 dark:text-slate-400">
-                    Check the shade family and nearest 3 matches before copying.
-                    The mathematically closest result is not always the best fit
-                    for your UI context.
-                  </p>
-                </li>
-                <li class="flex gap-3">
-                  <span
-                    class="flex size-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-sm font-bold text-slate-600 dark:bg-slate-800 dark:text-slate-300"
-                  >
-                    3
-                  </span>
-                  <p class="text-slate-600 dark:text-slate-400">
-                    If the arbitrary value suggestion appears, use it
-                    deliberately. That usually means the built-in palette is too
-                    far away from the original brand color.
-                  </p>
-                </li>
-              </ol>
-            </div>
+            <p>
+              Paste the real source color, not the one you already think is
+              closest. Glance at the nearest matches before you copy — the
+              closest number is not always the best fit on the page. If we
+              suggest a custom <code
+                class="bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
+              >bg-[#…]</code> class, the built-in palette is probably too far
+              from your brand color.
+            </p>
           </div>
         </section>
         <section
-          class="flex flex-col justify-between p-8 transition-shadow duration-300 border border-white shadow-xl dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-indigo-100/40 dark:shadow-none rounded-3xl md:p-10 hover:shadow-2xl"
+          class="flex flex-col justify-between p-8 transition-shadow duration-300 border border-white shadow-xl dark:border-indigo-900/50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-indigo-100/40 dark:shadow-lg dark:shadow-indigo-950/40 rounded-3xl md:p-10 hover:shadow-2xl"
         >
           <div>
             <h2
@@ -256,105 +169,24 @@ const image = "/meta.webp";
               class="space-y-4 leading-relaxed text-slate-600 dark:text-slate-400"
             >
               <p>
-                <Link url="https://hextotailwind.com/"> Originally </Link> created
-                by
+                This started as
+                <Link url="https://hextotailwind.com/">
+                  the original Hex to Tailwind
+                </Link>, built by
                 <Link url="https://github.com/mihailthebuilder/hex-tailwind">
                   Mihail
-                </Link>, a software engineer who wanted an easier way to match
-                existing brand colors to Tailwind CSS palettes without manually
-                eyeballing them.
+                </Link>
+                so he could match brand colors to Tailwind without squinting at
+                a palette.
               </p>
-              <h3
-                class="mt-4 text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100"
-              >
-                Why use this version?
-              </h3>
-              <p>This fork has been supercharged for the modern web:</p>
-              <ul class="ps-5 space-y-2 list-disc">
-                <li>
-                  <strong class="text-slate-800 dark:text-slate-200">
-                    Extended Color Support:
-                  </strong> Supports HEX (3, 4, 6, 8-character), RGB, RGBA, HSL, HSLA,
-                  and named CSS colors.
-                </li>
-                <li>
-                  <strong class="text-slate-800 dark:text-slate-200"
-                    >Alpha / Opacity:</strong
-                  > Colors with alpha (e.g. <code
-                    class="bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
-                  >
-                    rgba(59, 130, 246, 0.4)
-                  </code> or <code
-                    class="bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
-                  >
-                    #3B82F666
-                  </code>) output Tailwind classes with opacity like <code
-                    class="bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
-                  >
-                    blue-500/40
-                  </code>.
-                </li>
-                <li>
-                  <strong class="text-slate-800 dark:text-slate-200">
-                    Tailwind v1-v4 Palettes:
-                  </strong> Toggle between all four major Tailwind CSS versions with
-                  a single click.
-                </li>
-                <li>
-                  <strong class="text-slate-800 dark:text-slate-200">
-                    Accessibility Checks:
-                  </strong> Instantly see the matched color's contrast ratio against
-                  white and black text, with WCAG AA/AAA pass or fail badges so UI
-                  decisions are safer.
-                </li>
-                <li>
-                  <strong class="text-slate-800 dark:text-slate-200">
-                    Shade Family + Top 3 Matches:
-                  </strong> Instead of only showing one answer, this version previews
-                  the entire matched scale and the three nearest Tailwind candidates
-                  so you can compare real alternatives.
-                </li>
-                <li>
-                  <strong class="text-slate-800 dark:text-slate-200">
-                    Smarter Developer Output:
-                  </strong> Quick-copy <code
-                    class="bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
-                  >
-                    bg-
-                  </code>, <code
-                    class="bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
-                  >
-                    text-
-                  </code>, and <code
-                    class="bg-slate-100 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md font-mono text-sm shadow-sm"
-                  >
-                    border-
-                  </code> classes, arbitrary value fallback suggestions for poor matches,
-                  and dark mode complements for faster implementation.
-                </li>
-                <li>
-                  <strong class="text-slate-800 dark:text-slate-200">
-                    Built-In Color Converter:
-                  </strong> The tool also breaks your input into HEX, RGB, HSL, and
-                  OKLCH formats, which makes it useful even when you are not copying
-                  the Tailwind match directly.
-                </li>
-                <li>
-                  <strong class="text-slate-800 dark:text-slate-200">
-                    Search History:
-                  </strong> Recently viewed colors are saved locally so you can jump
-                  back to a previous comparison without retyping values.
-                </li>
-                <li>
-                  <strong class="text-slate-800 dark:text-slate-200">
-                    Premium UI:
-                  </strong> A redesigned, responsive glassmorphism aesthetic with
-                  split-view comparison, history controls, and richer analysis panels
-                  than the original utility.
-                </li>
-              </ul>
+              <p>
+                This version also looks up named colors and Tailwind tokens
+                across v1–v4, shows nearby matches and contrast, and keeps the
+                color plus version in the share link. You can batch-convert a
+                list or paste your own palette.
+              </p>
               <p class="pt-2">
-                Powered by <Link url="https://astro.build/">
+                Built with <Link url="https://astro.build/">
                   <span
                     class="font-semibold text-indigo-500 hover:text-indigo-600 hover:underline dark:text-indigo-400 dark:hover:text-indigo-300"
                   >
@@ -366,21 +198,21 @@ const image = "/meta.webp";
                   >
                     React
                   </span>
-                </Link>. Completely open source!
+                </Link>. The code is open source.
               </p>
               <div class="flex flex-wrap gap-3 pt-4">
                 <Link url="https://github.com/JalilAbdullayev/hex-tailwind/">
                   <span
                     class="inline-flex items-center justify-center rounded-xl bg-indigo-600 px-6 py-3 text-sm font-semibold text-white shadow-md hover:bg-indigo-700 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-indigo-600 transition-all dark:bg-indigo-500 dark:hover:bg-indigo-400"
                   >
-                    View this fork
+                    View on GitHub
                   </span>
                 </Link>
                 <Link url="https://github.com/mihailthebuilder/hex-tailwind">
                   <span
                     class="inline-flex items-center justify-center rounded-xl bg-slate-900 px-6 py-3 text-sm font-semibold text-white shadow-md hover:bg-slate-800 hover:-translate-y-0.5 focus-visible:outline focus-visible:outline-offset-2 focus-visible:outline-slate-900 transition-all dark:bg-slate-700 dark:hover:bg-slate-600"
                   >
-                    Original Repo
+                    Original project
                   </span>
                 </Link>
               </div>

@@ -1,18 +1,19 @@
-import { useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
+import { useStore } from "@nanostores/react";
+import { announceCopy, copyToastStore } from "../copyToastStore";
 
 const Copy = ({
-  onClick,
   children,
+  copiedValue,
+  onClick,
 }: {
-  onClick: () => void;
   children: ReactNode;
+  copiedValue?: string;
+  onClick: () => void;
 }) => {
-  const [copied, setCopied] = useState(false);
-
   const handleCopy = () => {
     onClick();
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+    announceCopy(copiedValue);
   };
 
   return (
@@ -25,26 +26,34 @@ const Copy = ({
         }
       }}
       className="relative rounded-xl transition-transform focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:outline-none active:scale-95"
-      aria-label={copied ? "Copied!" : "Click to copy to clipboard"}
+      aria-label={
+        copiedValue ? `Copy ${copiedValue}` : "Click to copy to clipboard"
+      }
     >
       {children}
-      {copied && (
-        <span className="absolute -inset-e-2 -inset-bs-2 flex size-5 items-center justify-center rounded-full bg-emerald-500 text-xs text-white">
-          <svg
-            width="10"
-            height="10"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        </span>
-      )}
     </button>
+  );
+};
+
+export const CopyToast = () => {
+  const toast = useStore(copyToastStore);
+
+  useEffect(() => {
+    if (!toast) return;
+
+    const timeout = window.setTimeout(() => copyToastStore.set(null), 1500);
+    return () => window.clearTimeout(timeout);
+  }, [toast]);
+
+  if (!toast) return null;
+
+  return (
+    <div
+      role="status"
+      className="fixed inset-be-6 left-1/2 z-[70] -translate-x-1/2 rounded-2xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-lg"
+    >
+      {toast.text}
+    </div>
   );
 };
 
